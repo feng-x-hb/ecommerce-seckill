@@ -1,0 +1,17 @@
+﻿# IDE
+.idea/
+.vscode/
+*.iml
+
+# 前端
+node_modules/
+dist/
+.env.local
+
+# 后端
+target/
+*.class
+
+# 系统
+.DS_Store
+Thumbs.db

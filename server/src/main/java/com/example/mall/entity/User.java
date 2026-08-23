@@ -1,5 +1,10 @@
 package com.example.mall.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.time.LocalDateTime;
 
 /**
@@ -10,7 +15,8 @@ import java.time.LocalDateTime;
  */
 public class User {
 
-    /** 主键，自增（对应 id） */
+    /** 主键，自增（对应 id）；AUTO 表示让数据库自增生成，插入后框架会把生成值回填到 id */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /** 用户名，登录用（对应 username） */
@@ -34,10 +40,12 @@ public class User {
     /** 状态：0正常 / 1禁用（对应 status） */
     private Integer status;
 
-    /** 创建时间，框架自动填充（对应 created_at） */
+    /** 创建时间，插入时自动填充（对应 created_at） */
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
-    /** 更新时间，框架自动填充（对应 updated_at） */
+    /** 更新时间，插入和更新时都自动填充（对应 updated_at） */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
 
     // ===== getter / setter：Java 访问私有字段的"门" =====

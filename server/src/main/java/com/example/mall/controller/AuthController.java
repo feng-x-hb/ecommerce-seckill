@@ -1,6 +1,8 @@
 package com.example.mall.controller;
 
 import com.example.mall.common.Result;
+import com.example.mall.dto.LoginDTO;
+import com.example.mall.dto.LoginVO;
 import com.example.mall.dto.RegisterDTO;
 import com.example.mall.service.AuthService;
 import jakarta.validation.Valid;
@@ -36,5 +38,18 @@ public class AuthController {
         // 3. 把业务丢给 Service，返回结果包进统一的 Result 盒子
         Long userId = authService.register(registerDTO);
         return Result.success(userId);
+    }
+
+    /**
+     * 登录接口：POST /api/auth/login
+     * 请求体传 {account, password}；成功返回 token + 用户基本信息（LoginVO）。
+     */
+    @PostMapping("/login")
+    public Result<LoginVO> login(@Valid @RequestBody LoginDTO loginDTO) {
+        // 1. @RequestBody：把 JSON 转成 LoginDTO（account 可以是用户名或手机号）
+        // 2. @Valid：校验账号、密码不为空
+        // 3. 业务全在 Service 里，Controller 只负责转手和打包
+        LoginVO loginVO = authService.login(loginDTO);
+        return Result.success(loginVO);
     }
 }

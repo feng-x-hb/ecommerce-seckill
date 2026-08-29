@@ -3,6 +3,8 @@ package com.example.mall.service;
 import com.example.mall.dto.RegisterDTO;
 import com.example.mall.dto.LoginDTO;
 import com.example.mall.dto.LoginVO;
+import com.example.mall.dto.ResetPasswordDTO;
+import com.example.mall.vo.UserInfoVO;
 
 /**
  * 认证服务接口（AuthService）
@@ -28,4 +30,19 @@ public interface AuthService {
      * @return 登录成功后的数据（token + 用户基本信息）
      */
     LoginVO login(LoginDTO loginDTO);
+
+    /**
+     * 获取当前登录用户的信息
+     *
+     * @param userId 当前用户 id（由拦截器从 token 解析后放入请求属性）
+     * @return 用户展示信息（不含密码、不含 token）
+     */
+    UserInfoVO me(Long userId);
+
+    /**
+     * 重置密码
+     *
+     * @param resetPasswordDTO 重置参数（username 或 phone + newPassword）
+     */
+    void resetPassword(ResetPasswordDTO resetPasswordDTO);
 }

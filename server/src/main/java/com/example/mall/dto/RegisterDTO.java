@@ -22,10 +22,12 @@ public class RegisterDTO {
     @Size(min = 6, max = 32, message = "密码长度必须在 6~32 个字符之间")
     private String password;
 
-    /** 手机号，唯一，中国大陆 11 位手机号 */
-    @NotBlank(message = "手机号不能为空")
+    /** 手机号，可选，中国大陆 11 位手机号 */
     @Pattern(regexp = "^1\\d{10}$", message = "手机号格式不正确")
     private String phone;
+
+    /** 角色：0=买家（默认），1=商家 */
+    private Integer role;
 
     public String getUsername() {
         return username;
@@ -50,4 +52,7 @@ public class RegisterDTO {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    public Integer getRole() { return role; }
+    public void setRole(Integer role) { this.role = role; }
 }

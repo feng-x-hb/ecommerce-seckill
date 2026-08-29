@@ -1,5 +1,8 @@
 package com.example.mall.config;
 
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.context.annotation.Bean;
@@ -9,19 +12,27 @@ import java.time.LocalDateTime;
 
 /**
  * MyBatis-Plus 配置类
- * 这里只做一件事：注册"字段自动填充器"。
- * 你的 user 表 created_at / updated_at 是 NOT NULL 且没有数据库默认值，
- * 所以每次插入都必须有值。有了这个填充器，只要实体字段标了
- * @TableField(fill = ...)，框架就会在插入/更新前自动把当前时间填进去，
- * 业务代码里完全不用手动 set 时间。
+ * 两件事：
+ *   1. 注册分页拦截器（PaginationInnerInterceptor）—— 让 selectPage 真正分页
+ *   2. 注册字段自动填充器 —— 让 created_at/updated_at 自动填时间
  */
 @Configuration
 public class MybatisPlusConfig {
 
+    /**
+     * 分页拦截器（必须注册，否则 selectPage 的 total 永远是 0）
+     * DbType.MYSQL：告诉拦截器用 MySQL 的分页语法（LIMIT）
+     */
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        return interceptor;
+    }
+
     @Bean
     public MetaObjectHandler metaObjectHandler() {
         return new MetaObjectHandler() {
-            /** 插入时填充 */
             @Override
             public void insertFill(MetaObject metaObject) {
                 LocalDateTime now = LocalDateTime.now();
@@ -29,7 +40,6 @@ public class MybatisPlusConfig {
                 this.strictInsertFill(metaObject, "updatedAt", LocalDateTime.class, now);
             }
 
-            /** 更新时填充 */
             @Override
             public void updateFill(MetaObject metaObject) {
                 this.strictUpdateFill(metaObject, "updatedAt", LocalDateTime.class, LocalDateTime.now());

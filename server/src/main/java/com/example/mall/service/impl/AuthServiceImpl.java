@@ -5,10 +5,12 @@ import com.example.mall.common.exception.BusinessException;
 import com.example.mall.dto.RegisterDTO;
 import com.example.mall.dto.LoginDTO;
 import com.example.mall.dto.LoginVO;
+import com.example.mall.dto.ResetPasswordDTO;
 import com.example.mall.entity.User;
 import com.example.mall.mapper.UserMapper;
 import com.example.mall.service.AuthService;
 import com.example.mall.util.JwtUtil;
+import com.example.mall.vo.UserInfoVO;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,12 +56,14 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException("用户名已被注册");
         }
 
-        // 第 2 步：手机号查重
-        Long phoneCount = userMapper.selectCount(
-                new LambdaQueryWrapper<User>()
-                        .eq(User::getPhone, registerDTO.getPhone()));
-        if (phoneCount > 0) {
-            throw new BusinessException("手机号已被注册");
+        // 第 2 步：手机号查重（手机号可选，有值时才查重）
+        if (registerDTO.getPhone() != null && !registerDTO.getPhone().isBlank()) {
+            Long phoneCount = userMapper.selectCount(
+                    new LambdaQueryWrapper<User>()
+                            .eq(User::getPhone, registerDTO.getPhone()));
+            if (phoneCount > 0) {
+                throw new BusinessException("手机号已被注册");
+            }
         }
 
         // 第 3 步：组装实体。密码绝不明文落库，先 BCrypt 加密
@@ -69,8 +73,8 @@ public class AuthServiceImpl implements AuthService {
         user.setPhone(registerDTO.getPhone());
         // 昵称默认等于用户名，用户以后可在个人中心修改
         user.setNickname(registerDTO.getUsername());
-        // 角色 0 = 买家；状态 0 = 正常（这两列数据库也有默认值，这里显式赋值更清晰）
-        user.setRole(0);
+        // 角色：前端传 role 就用，没传默认 0（买家）；状态 0 = 正常
+        user.setRole(registerDTO.getRole() != null ? registerDTO.getRole() : 0);
         user.setStatus(0);
 
         // 第 4 步：插入。created_at / updated_at 由 MyBatis-Plus 自动填充
@@ -125,5 +129,57 @@ public class AuthServiceImpl implements AuthService {
         loginVO.setNickname(user.getNickname());
         loginVO.setRole(user.getRole());
         return loginVO;
+    }
+
+    /**
+     * 获取当前登录用户信息（me）
+     * 流程：用拦截器解析出的 userId 查库 → 组装成 UserInfoVO（不含敏感字段）返回。
+     * 注意：login() 只查不改，不用加 @Transactional；查不到说明账号异常，抛业务异常。
+     */
+    @Override
+    public UserInfoVO me(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        UserInfoVO vo = new UserInfoVO();
+        vo.setId(user.getId());
+        vo.setUsername(user.getUsername());
+        vo.setNickname(user.getNickname());
+        vo.setAvatar(user.getAvatar());
+        vo.setRole(user.getRole());
+        return vo;
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordDTO dto) {
+        User user = null;
+
+        // 方式一：通过账号名找回
+        if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
+            user = userMapper.selectOne(
+                    new LambdaQueryWrapper<User>().eq(User::getUsername, dto.getUsername()));
+            if (user == null) {
+                throw new BusinessException("账号不存在");
+            }
+        }
+
+        // 方式二：通过手机号找回
+        if (dto.getPhone() != null && !dto.getPhone().isBlank()) {
+            user = userMapper.selectOne(
+                    new LambdaQueryWrapper<User>().eq(User::getPhone, dto.getPhone()));
+            if (user == null) {
+                throw new BusinessException("该手机号未注册");
+            }
+        }
+
+        if (user == null) {
+            throw new BusinessException("请提供账号名或手机号");
+        }
+
+        // 更新密码（BCrypt 加密）
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userMapper.updateById(user);
     }
 }

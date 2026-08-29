@@ -1,6 +1,8 @@
 package com.example.mall.common;
 
 import com.example.mall.common.exception.BusinessException;
+import com.example.mall.common.exception.ForbiddenException;
+import com.example.mall.common.exception.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.FieldError;
@@ -30,6 +32,26 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public Result<Void> handleBusinessException(BusinessException e) {
         return Result.error(400, e.getMessage());
+    }
+
+    /**
+     * 处理未登录异常（UnauthorizedException）
+     * 场景：没带 token、token 无效或已过期。
+     * 返回 401（body 里的 code），告诉前端"请先登录"。
+     */
+    @ExceptionHandler(UnauthorizedException.class)
+    public Result<Void> handleUnauthorizedException(UnauthorizedException e) {
+        return Result.error(401, e.getMessage());
+    }
+
+    /**
+     * 处理无权限异常（ForbiddenException）
+     * 场景：已登录但角色不够（如买家试图增删分类，应只有管理员）。
+     * 返回 403（body 里的 code），告诉前端"权限不足"。
+     */
+    @ExceptionHandler(ForbiddenException.class)
+    public Result<Void> handleForbiddenException(ForbiddenException e) {
+        return Result.error(403, e.getMessage());
     }
 
     /**

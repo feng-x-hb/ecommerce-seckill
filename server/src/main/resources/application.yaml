@@ -1,15 +1,42 @@
 spring:
   application:
     name: mall
+  # ========== 数据库初始化 ==========
+  # mode=always：应用启动时自动执行 schema.sql
+  # 因为 schema.sql 里全是 CREATE TABLE IF NOT EXISTS，重复执行安全、零数据丢失
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data-products.sql
   datasource:
     url: "jdbc:mysql://localhost:3306/mall?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai"
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+  # ========== Redis 配置 ==========
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
+
+# ========== 公开接口白名单 ==========
+# 这些路径不需要登录 token 即可访问（Ant 风格，* 表示通配）。
+# 以后商品列表/详情等公开接口，直接往下加一行即可，不用改 Java 代码。
+mall:
+  security:
+    public-paths:
+      - /api/auth/register
+      - /api/auth/login
+      - /api/auth/reset-password
+      - /api/category/list
+      - /api/product/list
+      - /api/product/*
+      - /api/seckill/list
 
 # ========== JWT 配置 ==========
 jwt:

@@ -1,0 +1,155 @@
+/* ==================== 全局样式 - 华丽版 ==================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --jd-red: #e1251b;
+  --jd-red-hover: #c81623;
+  --jd-red-light: #fff0f0;
+  --jd-orange: #ff6700;
+  --jd-gold: #f5a623;
+  --jd-bg: #f5f5f5;
+  --jd-white: #fff;
+  --jd-text: #333;
+  --jd-text-light: #999;
+  --jd-border: #e0e0e0;
+  --jd-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --jd-shadow-hover: 0 8px 30px rgba(225,37,27,0.15);
+  --jd-radius: 12px;
+  --container-width: 1200px;
+}
+
+/* 暗色主题 */
+[data-theme="dark"] {
+  --jd-bg: #1a1a1a;
+  --jd-white: #2a2a2a;
+  --jd-text: #e0e0e0;
+  --jd-text-light: #999;
+  --jd-border: #444;
+  --jd-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  --jd-shadow-hover: 0 8px 30px rgba(225,37,27,0.3);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--jd-bg);
+  color: var(--jd-text);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: hidden;
+  transition: background 0.5s, color 0.5s;
+}
+
+a { color: var(--jd-text); text-decoration: none; }
+a:hover { color: var(--jd-red); }
+
+.container {
+  width: var(--container-width);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.el-button--primary {
+  --el-button-bg-color: var(--jd-red) !important;
+  --el-button-border-color: var(--jd-red) !important;
+  --el-button-hover-bg-color: var(--jd-red-hover) !important;
+  --el-button-hover-border-color: var(--jd-red-hover) !important;
+}
+
+.card {
+  background: var(--jd-white);
+  border-radius: var(--jd-radius);
+  box-shadow: var(--jd-shadow);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.card:hover {
+  box-shadow: var(--jd-shadow-hover);
+}
+
+.section-gap { height: 20px; }
+
+.price { color: var(--jd-red); font-weight: bold; }
+.price-lg { font-size: 22px; }
+.price-sm { font-size: 16px; }
+
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ellipsis-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ==================== 动画 ==================== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(225,37,27,0.3); }
+  50% { box-shadow: 0 0 20px rgba(225,37,27,0.6); }
+}
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-fade-in { animation: fadeIn 0.6s ease; }
+.animate-fade-in-up { animation: fadeInUp 0.6s ease; }
+.animate-slide-in-left { animation: slideInLeft 0.6s ease; }
+.animate-pulse { animation: pulse 2s infinite; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-glow { animation: glow 2s infinite; }
+
+/* 渐变动画背景 */
+.gradient-animated {
+  background: linear-gradient(-45deg, #e1251b, #ff6700, #f5a623, #e1251b);
+  background-size: 400% 400%;
+  animation: gradientBG 8s ease infinite;
+}
+
+/* 骨架屏 shimmer */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* 悬浮效果 */
+.hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.hover-lift:hover { transform: translateY(-8px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
+
+/* 发光边框 */
+.glow-border { transition: box-shadow 0.3s ease; }
+.glow-border:hover { box-shadow: 0 0 0 2px var(--jd-red), 0 0 20px rgba(225,37,27,0.3); }
+
+/* 标签样式 */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.tag-red { background: var(--jd-red); color: #fff; }
+.tag-orange { background: var(--jd-orange); color: #fff; }
+.tag-gold { background: var(--jd-gold); color: #fff; }
+.tag-green { background: #2baa6e; color: #fff; }

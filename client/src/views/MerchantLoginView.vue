@@ -150,13 +150,6 @@ async function handlePhoneRegister() {
 
 <template>
   <div class="login-page" :class="{ dark: isDark }">
-    <button class="theme-toggle" @click="toggleTheme" :title="isDark ? '切换亮色' : '切换暗色'">
-      <el-icon :size="20">
-        <Sunny v-if="isDark" />
-        <Moon v-else />
-      </el-icon>
-    </button>
-
     <div class="login-body">
       <div class="login-card">
         <!-- 左侧装饰区 -->

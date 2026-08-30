@@ -117,13 +117,6 @@ async function handlePhoneReset() {
 
 <template>
   <div class="login-page" :class="{ dark: isDark }">
-    <button class="theme-toggle" @click="toggleTheme" :title="isDark ? '切换亮色' : '切换暗色'">
-      <el-icon :size="20">
-        <Sunny v-if="isDark" />
-        <Moon v-else />
-      </el-icon>
-    </button>
-
     <!-- 主内容区 -->
     <div class="login-body">
       <div class="login-card forgot-card">

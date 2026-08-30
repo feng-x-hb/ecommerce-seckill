@@ -1,8 +1,10 @@
 <script setup lang="ts">
 /**
- * 商品卡片组件 - 精简专业版
- * 简洁悬浮上移 + 中性阴影，去掉发光边框和3D倾斜
+ * 商品卡片组件 - 华丽3D版
+ * 鼠标跟随3D透视旋转 + 悬浮发光边框 + 图片放大
  */
+import { ref } from 'vue'
+
 defineProps<{
   id: number
   title: string
@@ -11,10 +13,49 @@ defineProps<{
   originalPrice?: number
   sales?: number
 }>()
+
+const cardRef = ref<HTMLElement>()
+const tiltX = ref(0)
+const tiltY = ref(0)
+const glowX = ref(50)
+const glowY = ref(50)
+const isHovering = ref(false)
+
+function onMouseMove(e: MouseEvent) {
+  if (!cardRef.value) return
+  const rect = cardRef.value.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+  const centerX = rect.width / 2
+  const centerY = rect.height / 2
+  tiltX.value = ((y - centerY) / centerY) * -10
+  tiltY.value = ((x - centerX) / centerX) * 10
+  glowX.value = (x / rect.width) * 100
+  glowY.value = (y / rect.height) * 100
+  isHovering.value = true
+}
+
+function onMouseLeave() {
+  tiltX.value = 0
+  tiltY.value = 0
+  isHovering.value = false
+}
 </script>
 
 <template>
-  <router-link :to="`/product/${id}`" class="product-card">
+  <router-link
+    :to="`/product/${id}`"
+    class="product-card"
+    ref="cardRef"
+    :style="{
+      transform: `perspective(600px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) ${isHovering ? 'translateZ(16px) scale(1.02)' : ''}`,
+      '--glow-x': glowX + '%',
+      '--glow-y': glowY + '%'
+    }"
+    :class="{ hovering: isHovering }"
+    @mousemove="onMouseMove"
+    @mouseleave="onMouseLeave"
+  >
     <div class="card-image">
       <img v-if="image" :src="image" :alt="title" class="product-img" loading="lazy" @error="($event.target as HTMLImageElement).style.display='none'" />
       <div class="placeholder-img" :style="{ background: `linear-gradient(135deg, hsl(${id * 47 % 360}, 55%, 88%), hsl(${id * 47 % 360 + 30}, 55%, 80%))` }">
@@ -65,12 +106,17 @@ defineProps<{
   border-radius: var(--jd-radius, 12px);
   overflow: hidden;
   color: var(--jd-text) !important;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  transition: transform 0.15s ease-out, box-shadow 0.3s ease;
   box-shadow: var(--jd-shadow-sm, 0 1px 4px rgba(0,0,0,0.06));
+  transform-style: preserve-3d;
+  will-change: transform;
 }
-.product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--jd-shadow-lg, 0 12px 32px rgba(0,0,0,0.15));
+.product-card.hovering {
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.15),
+    0 0 0 1px rgba(225,37,27,0.15),
+    0 0 30px rgba(225,37,27,0.08);
 }
 
 /* 图片区 */
@@ -86,17 +132,17 @@ defineProps<{
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.4s;
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .product-img {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
   object-fit: cover;
-  transition: transform 0.4s;
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   z-index: 2;
 }
-.product-card:hover .product-img { transform: scale(1.06); }
-.product-card:hover .placeholder-img { transform: scale(1.06); }
+.product-card.hovering .product-img { transform: scale(1.1); }
+.product-card.hovering .placeholder-img { transform: scale(1.1); }
 
 .placeholder-svg {
   width: 56px;
@@ -108,28 +154,29 @@ defineProps<{
 .hover-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.25);
+  background: rgba(0,0,0,0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 4;
   opacity: 0;
   transition: opacity 0.3s;
+  backdrop-filter: blur(2px);
   pointer-events: none;
 }
-.product-card:hover .hover-overlay { opacity: 1; }
+.product-card.hovering .hover-overlay { opacity: 1; }
 .view-text {
   background: rgba(255,255,255,0.95);
   color: var(--jd-red, #e1251b);
-  padding: 8px 20px;
+  padding: 8px 22px;
   border-radius: var(--jd-radius-pill, 999px);
   font-size: 13px;
-  font-weight: 500;
-  transform: translateY(8px);
-  transition: transform 0.3s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  font-weight: 600;
+  transform: translateY(10px);
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-.product-card:hover .view-text { transform: translateY(0); }
+.product-card.hovering .view-text { transform: translateY(0); }
 
 .hot-badge {
   position: absolute;
@@ -202,12 +249,12 @@ defineProps<{
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transform: scale(0.8);
-  transition: all 0.25s;
+  transform: scale(0.6) rotate(-20deg);
+  transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
 }
-.product-card:hover .card-action {
+.product-card.hovering .card-action {
   opacity: 1;
-  transform: scale(1);
+  transform: scale(1) rotate(0deg);
 }
 .card-action:hover {
   background: var(--jd-red-hover, #c81623);

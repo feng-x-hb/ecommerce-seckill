@@ -1,17 +1,21 @@
 <script setup lang="ts">
 /**
- * 首页 - 华丽版 v2
- * 通知条 + 轮播图(毛玻璃) + 分类导航 + 限时秒杀 + 为你推荐 + 热卖排行
+ * 首页 - 华丽3D版
+ * 鼠标粒子 + 3D卡片 + 滚动入场 + 自定义图标 + Mesh渐变背景
  */
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getProductList } from '@/api/product'
 import request from '@/api/request'
 import type { Product, Category } from '@/types'
 import ProductCard from '@/components/ProductCard.vue'
+import CategoryIcon from '@/components/CategoryIcon.vue'
+import { useMouseParticles } from '@/composables/useMouseParticles'
+import { useScrollReveal } from '@/composables/useScrollReveal'
 
 const route = useRoute()
 const router = useRouter()
+const heroRef = ref<HTMLElement>()
 
 const products = ref<Product[]>([])
 const categories = ref<Category[]>([])
@@ -25,10 +29,10 @@ const loading = ref(false)
 // 轮播
 const bannerIndex = ref(0)
 const banners = [
-  { gradient: 'linear-gradient(135deg, #e1251b, #ff6700)', icon: '🔥', title: '超级秒杀', sub: '限时限量 抢完即止', tag: '限时', link: '/seckill' },
-  { gradient: 'linear-gradient(135deg, #667eea, #764ba2)', icon: '📱', title: '新品首发', sub: 'iPhone 15 Pro Max 震撼上市', tag: '新品', link: '/search?keyword=新品' },
-  { gradient: 'linear-gradient(135deg, #f093fb, #f5576c)', icon: '🎁', title: '品质生活', sub: '精选好物 品质保证', tag: '精选', link: '/coupons' },
-  { gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)', icon: '💰', title: '数码狂欢', sub: '爆款直降 限时优惠', tag: '特惠', link: '/category/1' }
+  { gradient: 'linear-gradient(135deg, #e1251b 0%, #ff6700 100%)', icon: '🔥', title: '超级秒杀', sub: '限时限量 抢完即止', tag: '限时', link: '/seckill' },
+  { gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', icon: '📱', title: '新品首发', sub: 'iPhone 15 Pro Max 震撼上市', tag: '新品', link: '/search?keyword=新品' },
+  { gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', icon: '🎁', title: '品质生活', sub: '精选好物 品质保证', tag: '精选', link: '/coupons' },
+  { gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', icon: '💰', title: '数码狂欢', sub: '爆款直降 限时优惠', tag: '特惠', link: '/category/1' }
 ]
 
 // 倒计时
@@ -105,12 +109,21 @@ function selectCategory(catId: number | undefined) {
   }
 }
 
-onMounted(() => {
-  fetchProducts()
-  fetchCategories()
+// 鼠标粒子
+useMouseParticles(heroRef)
+
+// 滚动入场
+useScrollReveal()
+
+onMounted(async () => {
+  await fetchProducts()
+  await fetchCategories()
   updateCountdown()
   resetBannerTimer()
   countdownTimer = setInterval(updateCountdown, 1000)
+  await nextTick()
+  // re-observe after data loads
+  useScrollReveal()
 })
 
 onUnmounted(() => {
@@ -131,8 +144,8 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- ========== 顶部轮播区 ========== -->
-    <div class="hero-section container">
+    <!-- ========== 顶部轮播区（带鼠标粒子） ========== -->
+    <div class="hero-section container" ref="heroRef">
       <!-- 左侧分类 -->
       <div class="category-sidebar">
         <div class="sidebar-header">
@@ -145,12 +158,12 @@ onUnmounted(() => {
           :class="{ active: activeCategoryId === cat.id }"
           @click="selectCategory(cat.id)"
         >
-          <span class="cat-icon">{{ ['📱','👔','🏠','🍜','💄','⚽','🍼'][idx % 7] }}</span>
+          <CategoryIcon :name="cat.name" :size="18" />
           <span class="cat-name">{{ cat.name }}</span>
           <el-icon class="cat-arrow"><ArrowRight /></el-icon>
         </div>
         <div class="cat-item" :class="{ active: !activeCategoryId }" @click="selectCategory(undefined)">
-          <span class="cat-icon">🏷️</span>
+          <CategoryIcon name="全部" :size="18" />
           <span class="cat-name">全部</span>
         </div>
       </div>
@@ -182,28 +195,28 @@ onUnmounted(() => {
 
       <!-- 右侧信息卡 -->
       <div class="side-cards">
-        <div class="side-card" style="background:linear-gradient(135deg,#e1251b,#ff6700)">
+        <div class="side-card side-card-red">
           <div class="side-icon-wrap"><el-icon :size="24"><Timer /></el-icon></div>
           <div>
             <div class="side-card-title">限时秒杀</div>
             <div class="side-card-desc">每日上新</div>
           </div>
         </div>
-        <div class="side-card" style="background:linear-gradient(135deg,#2baa6e,#34d058)">
+        <div class="side-card side-card-green">
           <div class="side-icon-wrap"><el-icon :size="24"><CircleCheck /></el-icon></div>
           <div>
             <div class="side-card-title">品质保证</div>
             <div class="side-card-desc">正品行货</div>
           </div>
         </div>
-        <div class="side-card" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">
+        <div class="side-card side-card-blue">
           <div class="side-icon-wrap"><el-icon :size="24"><Van /></el-icon></div>
           <div>
             <div class="side-card-title">极速发货</div>
             <div class="side-card-desc">次日达</div>
           </div>
         </div>
-        <div class="side-card" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)">
+        <div class="side-card side-card-purple">
           <div class="side-icon-wrap"><el-icon :size="24"><Service /></el-icon></div>
           <div>
             <div class="side-card-title">售后服务</div>
@@ -214,7 +227,7 @@ onUnmounted(() => {
     </div>
 
     <!-- ========== 限时秒杀倒计时 ========== -->
-    <div class="section container">
+    <div class="section container scroll-reveal" data-delay="0">
       <div class="seckill-banner card">
         <div class="seckill-left">
           <div class="flash-badge">⚡</div>
@@ -240,7 +253,7 @@ onUnmounted(() => {
     </div>
 
     <!-- ========== 为你推荐 ========== -->
-    <div class="section container" v-if="recommendedProducts.length">
+    <div class="section container scroll-reveal" data-delay="100" v-if="recommendedProducts.length">
       <div class="section-header">
         <div class="section-title-group">
           <span class="title-icon-box" style="background:linear-gradient(135deg,#e1251b,#ff6700)"><el-icon :size="18" color="#fff"><Star /></el-icon></span>
@@ -259,14 +272,12 @@ onUnmounted(() => {
           :price="p.price"
           :original-price="p.originalPrice"
           :sales="p.sales"
-          :style="{ animationDelay: i * 0.1 + 's' }"
-          class="animate-fade-in-up"
         />
       </div>
     </div>
 
     <!-- ========== 热卖排行 ========== -->
-    <div class="section container" v-if="hotProducts.length">
+    <div class="section container scroll-reveal" data-delay="200" v-if="hotProducts.length">
       <div class="section-header">
         <div class="section-title-group">
           <span class="title-icon-box" style="background:linear-gradient(135deg,#ff6700,#f5a623)"><el-icon :size="18" color="#fff"><TrendCharts /></el-icon></span>
@@ -276,7 +287,7 @@ onUnmounted(() => {
         <div class="section-desc">大家都在买</div>
       </div>
       <div class="hot-grid">
-        <div v-for="(p, i) in hotProducts" :key="p.id" class="hot-card card hover-lift" :style="{ animationDelay: i * 0.15 + 's' }">
+        <div v-for="(p, i) in hotProducts" :key="p.id" class="hot-card card">
           <div class="hot-rank" :class="'rank-' + (i+1)">{{ i + 1 }}</div>
           <router-link :to="`/product/${p.id}`">
             <div class="hot-image" :style="{ background: `linear-gradient(135deg, hsl(${p.id * 47 % 360}, 55%, 88%), hsl(${p.id * 47 % 360 + 30}, 55%, 80%))` }">
@@ -297,7 +308,7 @@ onUnmounted(() => {
     </div>
 
     <!-- ========== 全部商品 ========== -->
-    <div class="section container">
+    <div class="section container scroll-reveal" data-delay="300">
       <div class="section-header">
         <div class="section-title-group">
           <span class="title-icon-box" style="background:linear-gradient(135deg,#333,#666)"><el-icon :size="18" color="#fff"><Grid /></el-icon></span>
@@ -325,8 +336,6 @@ onUnmounted(() => {
           :price="p.price"
           :original-price="p.originalPrice"
           :sales="p.sales"
-          :style="{ animationDelay: (i % 5) * 0.08 + 's' }"
-          class="animate-fade-in-up"
         />
       </div>
 
@@ -431,7 +440,6 @@ onUnmounted(() => {
   padding-left: 20px;
   border-left-color: #e1251b;
 }
-.cat-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
 .cat-name { flex: 1; }
 .cat-arrow { opacity: 0; transition: all 0.3s; transform: translateX(-4px); }
 .cat-item:hover .cat-arrow { opacity: 1; transform: translateX(0); }
@@ -542,6 +550,10 @@ onUnmounted(() => {
 }
 .side-card:last-child { border-bottom: none; }
 .side-card:hover { filter: brightness(1.1); transform: scale(1.02); }
+.side-card-red { background: linear-gradient(135deg, #e1251b, #ff6700); }
+.side-card-green { background: linear-gradient(135deg, #2baa6e, #34d058); }
+.side-card-blue { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.side-card-purple { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
 .side-icon-wrap {
   width: 40px;
   height: 40px;
@@ -565,7 +577,6 @@ onUnmounted(() => {
   background: #fff;
   border: 1px solid #f0f0f0;
   border-left: 4px solid #e1251b;
-  position: relative;
 }
 .seckill-left {
   display: flex;
@@ -588,7 +599,7 @@ onUnmounted(() => {
 .countdown-label { font-size: 12px; color: #999; display: block; margin-bottom: 4px; }
 .countdown-nums { display: flex; align-items: center; gap: 4px; }
 .num-block {
-  background: linear-gradient(135deg, #333, #555);
+  background: #333;
   color: #fff;
   padding: 6px 10px;
   border-radius: 6px;
@@ -596,7 +607,7 @@ onUnmounted(() => {
   font-weight: bold;
   min-width: 40px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-variant-numeric: tabular-nums;
 }
 .num-sep { font-size: 18px; font-weight: bold; color: var(--jd-red); }
 .seckill-more {
@@ -705,24 +716,26 @@ onUnmounted(() => {
   top: 0; left: 0; width: 100%; height: 100%;
   object-fit: cover;
   z-index: 2;
-  transition: transform 0.4s;
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .hot-card:hover .hot-img { transform: scale(1.08); }
-.hot-image span {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 40px;
-  color: rgba(255,255,255,0.7);
-  font-weight: bold;
-}
 .hot-svg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 48px; height: 48px; color: rgba(255,255,255,0.6); }
 .hot-name { font-size: 13px; margin-bottom: 4px; }
 
 .empty-state { text-align: center; padding: 80px 0; color: #ccc; }
 .empty-icon { font-size: 60px; margin-bottom: 16px; }
 .pagination { display: flex; justify-content: center; padding: 30px 0 20px; }
+
+/* ========== 滚动入场动画 ========== */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1), transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 @media (max-width: 1200px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 900px) { .product-grid, .hot-grid { grid-template-columns: repeat(3, 1fr); } }

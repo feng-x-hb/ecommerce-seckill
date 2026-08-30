@@ -37,6 +37,21 @@ const targetTime = ref(new Date().setHours(23, 59, 59, 999))
 let bannerTimer: ReturnType<typeof setInterval>
 let countdownTimer: ReturnType<typeof setInterval>
 
+function resetBannerTimer() {
+  clearInterval(bannerTimer)
+  bannerTimer = setInterval(() => { bannerIndex.value = (bannerIndex.value + 1) % banners.length }, 5000)
+}
+
+function bannerPrev() {
+  bannerIndex.value = (bannerIndex.value - 1 + banners.length) % banners.length
+  resetBannerTimer()
+}
+
+function bannerNext() {
+  bannerIndex.value = (bannerIndex.value + 1) % banners.length
+  resetBannerTimer()
+}
+
 const timeLeft = ref({ hours: 0, minutes: 0, seconds: 0 })
 
 function updateCountdown() {
@@ -94,7 +109,7 @@ onMounted(() => {
   fetchProducts()
   fetchCategories()
   updateCountdown()
-  bannerTimer = setInterval(() => { bannerIndex.value = (bannerIndex.value + 1) % banners.length }, 5000)
+  resetBannerTimer()
   countdownTimer = setInterval(updateCountdown, 1000)
 })
 
@@ -153,6 +168,12 @@ onUnmounted(() => {
 
       <!-- 右侧轮播 -->
       <div class="banner-wrapper">
+        <button class="banner-arrow banner-arrow-left" @click="bannerPrev">
+          <el-icon :size="20"><ArrowLeft /></el-icon>
+        </button>
+        <button class="banner-arrow banner-arrow-right" @click="bannerNext">
+          <el-icon :size="20"><ArrowRight /></el-icon>
+        </button>
         <div class="banner-slide" :style="{ background: banners[bannerIndex].gradient }">
           <div class="banner-content animate-fade-in" :key="bannerIndex">
             <div class="banner-tag">{{ banners[bannerIndex].tag }}</div>
@@ -460,6 +481,29 @@ onUnmounted(() => {
 .cat-item:hover .cat-arrow { opacity: 1; transform: translateX(0); }
 
 .banner-wrapper { flex: 1; position: relative; }
+.banner-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+.banner-wrapper:hover .banner-arrow { opacity: 1; }
+.banner-arrow:hover { background: rgba(255,255,255,0.5); color: #333; transform: translateY(-50%) scale(1.1); }
+.banner-arrow-left { left: 12px; }
+.banner-arrow-right { right: 12px; }
 .banner-slide {
   height: 340px;
   position: relative;

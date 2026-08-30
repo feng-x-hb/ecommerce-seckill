@@ -3,7 +3,7 @@
  * 首页 - 华丽3D版
  * 鼠标粒子 + 3D卡片 + 滚动入场 + 自定义图标 + Mesh渐变背景
  */
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getProductList } from '@/api/product'
 import request from '@/api/request'
@@ -11,7 +11,6 @@ import type { Product, Category } from '@/types'
 import ProductCard from '@/components/ProductCard.vue'
 import CategoryIcon from '@/components/CategoryIcon.vue'
 import { useMouseParticles } from '@/composables/useMouseParticles'
-import { useScrollReveal } from '@/composables/useScrollReveal'
 
 const route = useRoute()
 const router = useRouter()
@@ -112,18 +111,12 @@ function selectCategory(catId: number | undefined) {
 // 鼠标粒子
 useMouseParticles(heroRef)
 
-// 滚动入场
-useScrollReveal()
-
 onMounted(async () => {
   await fetchProducts()
   await fetchCategories()
   updateCountdown()
   resetBannerTimer()
   countdownTimer = setInterval(updateCountdown, 1000)
-  await nextTick()
-  // re-observe after data loads
-  useScrollReveal()
 })
 
 onUnmounted(() => {
@@ -227,7 +220,7 @@ onUnmounted(() => {
     </div>
 
     <!-- ========== 限时秒杀倒计时 ========== -->
-    <div class="section container scroll-reveal" data-delay="0">
+    <div class="section container">
       <div class="seckill-banner card">
         <div class="seckill-left">
           <div class="flash-badge">⚡</div>
@@ -253,7 +246,7 @@ onUnmounted(() => {
     </div>
 
     <!-- ========== 为你推荐 ========== -->
-    <div class="section container scroll-reveal" data-delay="100" v-if="recommendedProducts.length">
+    <div class="section container" v-if="recommendedProducts.length">
       <div class="section-header">
         <div class="section-title-group">
           <span class="title-icon-box" style="background:linear-gradient(135deg,#e1251b,#ff6700)"><el-icon :size="18" color="#fff"><Star /></el-icon></span>
@@ -277,7 +270,7 @@ onUnmounted(() => {
     </div>
 
     <!-- ========== 热卖排行 ========== -->
-    <div class="section container scroll-reveal" data-delay="200" v-if="hotProducts.length">
+    <div class="section container" v-if="hotProducts.length">
       <div class="section-header">
         <div class="section-title-group">
           <span class="title-icon-box" style="background:linear-gradient(135deg,#ff6700,#f5a623)"><el-icon :size="18" color="#fff"><TrendCharts /></el-icon></span>
@@ -308,7 +301,7 @@ onUnmounted(() => {
     </div>
 
     <!-- ========== 全部商品 ========== -->
-    <div class="section container scroll-reveal" data-delay="300">
+    <div class="section container">
       <div class="section-header">
         <div class="section-title-group">
           <span class="title-icon-box" style="background:linear-gradient(135deg,#333,#666)"><el-icon :size="18" color="#fff"><Grid /></el-icon></span>
@@ -725,17 +718,6 @@ onUnmounted(() => {
 .empty-state { text-align: center; padding: 80px 0; color: #ccc; }
 .empty-icon { font-size: 60px; margin-bottom: 16px; }
 .pagination { display: flex; justify-content: center; padding: 30px 0 20px; }
-
-/* ========== 滚动入场动画 ========== */
-.scroll-reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1), transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.scroll-reveal.revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
 
 @media (max-width: 1200px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 900px) { .product-grid, .hot-grid { grid-template-columns: repeat(3, 1fr); } }

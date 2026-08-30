@@ -193,6 +193,7 @@ function onMouseLeave() {
   opacity: 0;
   transition: opacity 0.3s;
   backdrop-filter: blur(2px);
+  pointer-events: none;
 }
 .product-card:hover .hover-overlay { opacity: 1; }
 .view-text {

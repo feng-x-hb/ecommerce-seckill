@@ -123,7 +123,7 @@ function onMouseLeave() {
 .card-image {
   position: relative;
   width: 100%;
-  padding-top: 100%;
+  padding-top: 85%;
   overflow: hidden;
 }
 .placeholder-img {
@@ -206,12 +206,12 @@ function onMouseLeave() {
 }
 
 /* 卡片内容 */
-.card-body { padding: var(--sp-3, 12px) var(--sp-3, 12px) var(--sp-4, 16px); }
+.card-body { padding: 10px 10px 12px; }
 .card-title {
   font-size: 13px;
   line-height: 1.4;
-  height: 38px;
-  margin-bottom: var(--sp-2, 8px);
+  height: 34px;
+  margin-bottom: 6px;
   color: var(--jd-text, #333);
 }
 .card-price {

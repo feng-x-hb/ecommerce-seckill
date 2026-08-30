@@ -662,14 +662,14 @@ onUnmounted(() => {
 .product-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
+  gap: 12px;
   min-height: 200px;
 }
 
 .hot-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 12px;
 }
 .hot-card {
   position: relative;

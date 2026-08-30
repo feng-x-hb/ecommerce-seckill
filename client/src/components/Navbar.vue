@@ -61,10 +61,10 @@ function handleLogout() {
 
 <template>
   <div class="navbar">
-    <!-- 第一行：Logo + 搜索 + 用户 -->
     <div class="nav-top">
       <div class="nav-top-inner">
-        <!-- Logo -->
+
+        <!-- Logo — 左侧 5%，跨两行 -->
         <router-link to="/" class="logo">
           <img src="/images/优购logo设计.png" alt="优购" class="logo-img" />
           <div class="logo-text">
@@ -73,7 +73,7 @@ function handleLogout() {
           </div>
         </router-link>
 
-        <!-- 搜索框 -->
+        <!-- 搜索框 — 中心，上半行 -->
         <div class="search-wrapper">
           <div class="search-box" :class="{ focused: isSearchFocused }">
             <input
@@ -88,7 +88,6 @@ function handleLogout() {
             />
             <button class="search-btn" @click="handleSearch()">搜索</button>
           </div>
-          <!-- 搜索历史 -->
           <div v-if="showHistory && searchHistory.length && !searchSuggestions.length" class="search-dropdown">
             <div class="dropdown-header">
               <span>搜索历史</span>
@@ -98,7 +97,6 @@ function handleLogout() {
               <el-icon :size="14" color="#bbb"><Clock /></el-icon> {{ item }}
             </div>
           </div>
-          <!-- 搜索补全 -->
           <div v-if="searchSuggestions.length" class="search-dropdown">
             <div v-for="item in searchSuggestions" :key="item" class="dropdown-item" @mousedown="handleSearch(item)">
               <el-icon :size="14" color="#e1251b"><Search /></el-icon> {{ item }}
@@ -106,7 +104,7 @@ function handleLogout() {
           </div>
         </div>
 
-        <!-- 右侧按钮 -->
+        <!-- 购物车/用户 — 右侧 5%，跨两行 -->
         <div class="nav-actions">
           <router-link to="/cart" class="action-item" title="购物车">
             <el-icon :size="22"><ShoppingCart /></el-icon>
@@ -136,23 +134,21 @@ function handleLogout() {
             <span>请登录</span>
           </router-link>
         </div>
-      </div>
-    </div>
 
-    <!-- 第二行：导航链接 -->
-    <div class="nav-links-bar">
-      <div class="nav-links-inner">
-        <router-link to="/" class="nav-link"><el-icon :size="14"><HomeFilled /></el-icon> 首页</router-link>
-        <router-link to="/seckill" class="nav-link seckill-link"><el-icon :size="14"><Lightning /></el-icon> 秒杀</router-link>
-        <router-link to="/category/1" class="nav-link">数码家电</router-link>
-        <router-link to="/category/2" class="nav-link">服饰鞋包</router-link>
-        <router-link to="/category/3" class="nav-link">家居日用</router-link>
-        <router-link to="/category/4" class="nav-link">食品饮料</router-link>
-        <router-link to="/category/5" class="nav-link">美妆个护</router-link>
-        <router-link to="/category/6" class="nav-link">运动户外</router-link>
-        <router-link to="/category/7" class="nav-link">母婴玩具</router-link>
-        <router-link to="/orders" class="nav-link">我的订单</router-link>
-        <router-link to="/coupons" class="nav-link">领券中心</router-link>
+        <!-- 导航链接 — 下半行 15%~85% -->
+        <div class="nav-links-row">
+          <router-link to="/" class="nav-link"><el-icon :size="14"><HomeFilled /></el-icon> 首页</router-link>
+          <router-link to="/seckill" class="nav-link seckill-link"><el-icon :size="14"><Lightning /></el-icon> 秒杀</router-link>
+          <router-link to="/category/1" class="nav-link">数码家电</router-link>
+          <router-link to="/category/2" class="nav-link">服饰鞋包</router-link>
+          <router-link to="/category/3" class="nav-link">家居日用</router-link>
+          <router-link to="/category/4" class="nav-link">食品饮料</router-link>
+          <router-link to="/category/5" class="nav-link">美妆个护</router-link>
+          <router-link to="/category/6" class="nav-link">运动户外</router-link>
+          <router-link to="/category/7" class="nav-link">母婴玩具</router-link>
+          <router-link to="/orders" class="nav-link">我的订单</router-link>
+          <router-link to="/coupons" class="nav-link">领券中心</router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -161,23 +157,24 @@ function handleLogout() {
 <style scoped>
 .navbar { position: sticky; top: 0; z-index: 100; width: 100%; }
 
-/* ========== 第一行：白底 header ========== */
+/* 整个 navbar 是一个 96px 高的相对定位容器 */
 .nav-top {
   position: relative;
   width: 100%;
+  height: 96px;
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
 }
 .nav-top-inner {
   position: relative;
-  height: 60px;
   width: 100%;
+  height: 100%;
 }
 
-/* Logo — 左侧 10% */
+/* ========== Logo — 左 5%，跨两行 ========== */
 .logo {
   position: absolute;
-  left: 10%;
+  left: 5%;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -185,22 +182,23 @@ function handleLogout() {
   gap: 8px;
   text-decoration: none;
   color: #333 !important;
+  z-index: 2;
 }
 .logo-img {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
   border-radius: 8px;
 }
 .logo-text { display: flex; flex-direction: column; }
-.logo-name { font-size: 20px; font-weight: 700; color: #e1251b; line-height: 1.2; }
+.logo-name { font-size: 22px; font-weight: 700; color: #e1251b; line-height: 1.2; }
 .logo-slogan { font-size: 10px; color: #999; letter-spacing: 1px; }
 
-/* 搜索框 — 中心对齐 */
+/* ========== 搜索框 — 水平居中，上半行 ========== */
 .search-wrapper {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 30px;
   transform: translate(-50%, -50%);
   width: 30%;
   min-width: 320px;
@@ -278,15 +276,16 @@ function handleLogout() {
 }
 .dropdown-item:hover { background: #f5f5f5; color: #333; }
 
-/* 右侧按钮 — 右侧 90% */
+/* ========== 购物车/用户 — 右 5%，跨两行 ========== */
 .nav-actions {
   position: absolute;
-  right: 10%;
+  right: 5%;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 20px;
+  z-index: 2;
 }
 .action-item {
   display: flex;
@@ -303,17 +302,17 @@ function handleLogout() {
 }
 .action-item:hover { color: #e1251b !important; background: #fff5f5; }
 
-/* ========== 第二行：导航链接 15% → 85% ========== */
-.nav-links-bar {
-  width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
-}
-.nav-links-inner {
+/* ========== 导航链接 — 下半行，15%~85% ========== */
+.nav-links-row {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
   display: flex;
   align-items: center;
-  height: 36px;
   margin: 0 15%;
+  border-top: 1px solid #f0f0f0;
   overflow-x: auto;
 }
 .nav-link {

@@ -28,10 +28,10 @@ const loading = ref(false)
 // 轮播
 const bannerIndex = ref(0)
 const banners = [
-  { image: '/images/banner1.png', title: '超级秒杀', sub: '限时限量 抢完即止', tag: '限时', link: '/seckill' },
-  { image: '/images/banner2.png', title: '新品首发', sub: '潮流新品 震撼上市', tag: '新品', link: '/search?keyword=新品' },
-  { image: '/images/banner3.png', title: '品质生活', sub: '精选好物 品质保证', tag: '精选', link: '/coupons' },
-  { image: '/images/banner4.png', title: '数码狂欢', sub: '爆款直降 限时优惠', tag: '特惠', link: '/category/1' }
+  { image: '/images/banner1.png', link: '/seckill' },
+  { image: '/images/banner2.png', link: '/search?keyword=新品' },
+  { image: '/images/banner3.png', link: '/coupons' },
+  { image: '/images/banner4.png', link: '/category/1' }
 ]
 
 // 倒计时
@@ -171,14 +171,8 @@ onUnmounted(() => {
         </button>
         <div class="banner-slide">
           <img :src="banners[bannerIndex].image" :alt="banners[bannerIndex].title" class="banner-img" />
-          <div class="banner-content animate-fade-in" :key="bannerIndex">
-            <div class="banner-tag">{{ banners[bannerIndex].tag }}</div>
-            <h2 class="banner-title">{{ banners[bannerIndex].title }}</h2>
-            <p class="banner-sub">{{ banners[bannerIndex].sub }}</p>
-            <router-link :to="banners[bannerIndex].link" class="banner-btn">
-              立即查看 <el-icon><ArrowRight /></el-icon>
-            </router-link>
-          </div>
+          <router-link :to="banners[bannerIndex].link" class="banner-link"></router-link>
+          <!-- 轮播指示器 -->
           <!-- 轮播指示器 -->
           <div class="banner-dots">
             <span v-for="(_, i) in banners" :key="i" class="dot" :class="{ active: i === bannerIndex }" @click="bannerIndex = i" />
@@ -484,44 +478,15 @@ onUnmounted(() => {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(90deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
   z-index: 2;
   pointer-events: none;
 }
-.banner-content {
-  position: relative;
-  z-index: 2;
-  padding: 24px;
-  color: #fff;
-}
-.banner-tag {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 16px;
-  font-size: 11px;
-  margin-bottom: 8px;
-  background: rgba(255,255,255,0.25);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.3);
-}
-.banner-title { font-size: 28px; font-weight: bold; margin-bottom: 6px; text-shadow: 0 3px 12px rgba(0,0,0,0.4); }
-.banner-sub { font-size: 14px; opacity: 0.95; margin-bottom: 14px; text-shadow: 0 1px 6px rgba(0,0,0,0.3); }
-.banner-btn {
-  padding: 7px 20px;
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.5);
-  color: #fff;
-  border-radius: 20px;
+.banner-link {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 3;
   cursor: pointer;
-  font-size: 13px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.3s;
-  backdrop-filter: blur(8px);
-  text-decoration: none;
 }
-.banner-btn:hover { background: #fff; color: #333; transform: translateX(4px); }
 
 .banner-dots {
   position: absolute;

@@ -401,7 +401,7 @@ onUnmounted(() => {
 }
 
 .category-sidebar {
-  width: 170px;
+  width: 185px;
   background: linear-gradient(180deg, #2c2c2c, #1a1a1a);
   flex-shrink: 0;
 }
@@ -462,7 +462,7 @@ onUnmounted(() => {
 .banner-arrow-left { left: 8px; }
 .banner-arrow-right { right: 8px; }
 .banner-slide {
-  height: 260px;
+  height: 290px;
   position: relative;
   display: flex;
   align-items: center;
@@ -523,7 +523,7 @@ onUnmounted(() => {
 .dot.active { background: #fff; width: 22px; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
 
 .side-cards {
-  width: 150px;
+  width: 165px;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -662,7 +662,7 @@ onUnmounted(() => {
 .product-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  gap: 6px;
   min-height: 150px;
 }
 

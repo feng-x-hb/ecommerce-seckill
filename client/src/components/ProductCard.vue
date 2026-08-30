@@ -123,7 +123,7 @@ function onMouseLeave() {
 .card-image {
   position: relative;
   width: 100%;
-  padding-top: 75%;
+  padding-top: 70%;
   overflow: hidden;
 }
 .placeholder-img {

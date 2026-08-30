@@ -163,26 +163,26 @@ function handleLogout() {
 
 /* ========== 第一行：白底 header ========== */
 .nav-top {
+  position: relative;
   width: 100%;
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  justify-content: center;
 }
 .nav-top-inner {
-  display: flex;
-  align-items: center;
+  position: relative;
   height: 60px;
-  gap: 24px;
-  width: 70%;
+  width: 100%;
 }
 
-/* Logo */
+/* Logo — 左侧 10% */
 .logo {
+  position: absolute;
+  left: 10%;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
   text-decoration: none;
   color: #333 !important;
 }
@@ -196,11 +196,16 @@ function handleLogout() {
 .logo-name { font-size: 20px; font-weight: 700; color: #e1251b; line-height: 1.2; }
 .logo-slogan { font-size: 10px; color: #999; letter-spacing: 1px; }
 
-/* 搜索框 */
+/* 搜索框 — 中心对齐 */
 .search-wrapper {
-  flex: 1;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 30%;
+  min-width: 320px;
   max-width: 520px;
-  position: relative;
+  z-index: 10;
 }
 .search-box {
   display: flex;
@@ -273,12 +278,15 @@ function handleLogout() {
 }
 .dropdown-item:hover { background: #f5f5f5; color: #333; }
 
-/* 右侧按钮 */
+/* 右侧按钮 — 右侧 90% */
 .nav-actions {
+  position: absolute;
+  right: 10%;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 20px;
-  flex-shrink: 0;
 }
 .action-item {
   display: flex;
@@ -295,20 +303,17 @@ function handleLogout() {
 }
 .action-item:hover { color: #e1251b !important; background: #fff5f5; }
 
-/* ========== 第二行：导航链接 ========== */
+/* ========== 第二行：导航链接 15% → 85% ========== */
 .nav-links-bar {
   width: 100%;
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  justify-content: center;
 }
 .nav-links-inner {
   display: flex;
   align-items: center;
   height: 36px;
-  gap: 0;
-  width: 70%;
+  margin: 0 15%;
   overflow-x: auto;
 }
 .nav-link {

@@ -462,7 +462,7 @@ onUnmounted(() => {
 .banner-arrow-left { left: 8px; }
 .banner-arrow-right { right: 8px; }
 .banner-slide {
-  height: 290px;
+  height: 435px;
   position: relative;
   display: flex;
   align-items: center;

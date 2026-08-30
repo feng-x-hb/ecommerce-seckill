@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
@@ -7,7 +7,7 @@ import request from '@/api/request'
 
 const router = useRouter()
 const userStore = useUserStore()
-const searchKeyword = ref('iPhone 15 Pro')
+const searchKeyword = ref('')
 const isSearchFocused = ref(false)
 const searchHistory = ref<string[]>([])
 const showHistory = ref(false)
@@ -61,130 +61,98 @@ function handleLogout() {
 
 <template>
   <div class="navbar">
-    <div class="main-nav">
-      <div class="main-nav-inner">
+    <!-- 第一行：Logo + 搜索 + 用户 -->
+    <div class="nav-top">
+      <div class="nav-top-inner">
         <!-- Logo -->
         <router-link to="/" class="logo">
           <img src="/images/优购logo设计.png" alt="优购" class="logo-img" />
           <div class="logo-text">
             <span class="logo-name">优购</span>
-            <span class="logo-slogan">品质生活</span>
+            <span class="logo-slogan">YouGou.com</span>
           </div>
         </router-link>
 
-        <!-- 导航链接 -->
-        <div class="nav-links">
-          <router-link to="/" class="nav-link">
-            <span class="nav-icon"><el-icon :size="16"><HomeFilled /></el-icon></span>
-            首页
-          </router-link>
-          <router-link to="/seckill" class="nav-link seckill-link">
-            <span class="nav-icon seckill-icon"><el-icon :size="16"><Lightning /></el-icon></span>
-            秒杀
-            <span class="hot-dot"></span>
-          </router-link>
-          <router-link to="/orders" class="nav-link">
-            <span class="nav-icon"><el-icon :size="16"><List /></el-icon></span>
-            我的订单
-          </router-link>
-        </div>
-
         <!-- 搜索框 -->
-        <div class="nav-search-wrapper">
-          <div class="nav-search" :class="{ focused: isSearchFocused }">
-            <div class="search-icon">
-              <el-icon :size="16"><Search /></el-icon>
-            </div>
+        <div class="search-wrapper">
+          <div class="search-box" :class="{ focused: isSearchFocused }">
             <input
               v-model="searchKeyword"
               type="text"
-              placeholder="iPhone 15 Pro"
+              placeholder="搜索商品"
               class="search-input"
               @focus="isSearchFocused = true; showHistory = true"
               @blur="setTimeout(() => { showHistory = false; searchSuggestions = [] }, 200)"
               @keyup.enter="handleSearch()"
               @input="onSearchInput()"
             />
-            <button class="search-btn" @click="handleSearch()">
-              <el-icon :size="14"><Search /></el-icon>
-            </button>
+            <button class="search-btn" @click="handleSearch()">搜索</button>
           </div>
-          <!-- 搜索历史下拉 -->
-          <div v-if="showHistory && searchHistory.length && !searchSuggestions.length" class="search-history">
-            <div class="history-header">
+          <!-- 搜索历史 -->
+          <div v-if="showHistory && searchHistory.length && !searchSuggestions.length" class="search-dropdown">
+            <div class="dropdown-header">
               <span>搜索历史</span>
               <span class="clear-btn" @click="clearHistory">清空</span>
             </div>
-            <div
-              v-for="item in searchHistory"
-              :key="item"
-              class="history-item"
-              @mousedown="handleSearch(item)"
-            >
-              <el-icon :size="14" style="margin-right:8px;color:#bbb"><Clock /></el-icon>
-              {{ item }}
+            <div v-for="item in searchHistory" :key="item" class="dropdown-item" @mousedown="handleSearch(item)">
+              <el-icon :size="14" color="#bbb"><Clock /></el-icon> {{ item }}
             </div>
           </div>
-          <!-- 搜索补全下拉 -->
-          <div v-if="searchSuggestions.length" class="search-history">
-            <div
-              v-for="item in searchSuggestions"
-              :key="item"
-              class="history-item"
-              @mousedown="handleSearch(item)"
-            >
-              <el-icon :size="14" style="margin-right:8px;color:#e1251b"><Search /></el-icon>
-              {{ item }}
+          <!-- 搜索补全 -->
+          <div v-if="searchSuggestions.length" class="search-dropdown">
+            <div v-for="item in searchSuggestions" :key="item" class="dropdown-item" @mousedown="handleSearch(item)">
+              <el-icon :size="14" color="#e1251b"><Search /></el-icon> {{ item }}
             </div>
           </div>
         </div>
 
-        <!-- 右侧：购物车 + 头像 -->
-        <div class="nav-right">
-          <router-link to="/cart" class="cart-icon" title="购物车">
-            <el-badge :value="0" :hidden="true">
-              <div class="icon-circle">
-                <el-icon :size="20"><ShoppingCart /></el-icon>
-              </div>
-            </el-badge>
+        <!-- 右侧按钮 -->
+        <div class="nav-actions">
+          <router-link to="/cart" class="action-item" title="购物车">
+            <el-icon :size="22"><ShoppingCart /></el-icon>
+            <span>购物车</span>
           </router-link>
 
           <el-dropdown v-if="userStore.userInfo" trigger="click" @command="(cmd: string) => { if (cmd === 'logout') handleLogout(); if (cmd === 'info') router.push('/profile'); if (cmd === 'favorites') router.push('/favorites'); if (cmd === 'coupons') router.push('/coupons') }">
-            <div class="avatar-area">
-              <div class="avatar-circle">
-                <el-icon :size="20"><User /></el-icon>
-              </div>
-              <span class="avatar-name">{{ userStore.userInfo.nickname }}</span>
-              <el-icon class="avatar-arrow"><ArrowDown /></el-icon>
+            <div class="action-item">
+              <el-icon :size="22"><User /></el-icon>
+              <span>{{ userStore.userInfo.nickname }}</span>
             </div>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item disabled>
                   <span style="color:#999;font-size:12px">登录账号：{{ userStore.userInfo.nickname }}</span>
                 </el-dropdown-item>
-                <el-dropdown-item divided command="info">
-                  <el-icon><Edit /></el-icon> 个人中心
-                </el-dropdown-item>
-                <el-dropdown-item command="favorites">
-                  <el-icon><Star /></el-icon> 我的收藏
-                </el-dropdown-item>
-                <el-dropdown-item command="coupons">
-                  <el-icon><Ticket /></el-icon> 优惠券
-                </el-dropdown-item>
-                <el-dropdown-item command="logout" style="color:#e1251b">
-                  <el-icon><SwitchButton /></el-icon> 退出登录
-                </el-dropdown-item>
+                <el-dropdown-item divided command="info"><el-icon><Edit /></el-icon> 个人中心</el-dropdown-item>
+                <el-dropdown-item command="favorites"><el-icon><Star /></el-icon> 我的收藏</el-dropdown-item>
+                <el-dropdown-item command="coupons"><el-icon><Ticket /></el-icon> 优惠券</el-dropdown-item>
+                <el-dropdown-item command="logout" style="color:#e1251b"><el-icon><SwitchButton /></el-icon> 退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
 
-          <router-link v-else to="/login" class="login-link">
-            <div class="avatar-circle">
-              <el-icon :size="20"><User /></el-icon>
-            </div>
-            <span class="avatar-name">请登录</span>
+          <router-link v-else to="/login" class="action-item">
+            <el-icon :size="22"><User /></el-icon>
+            <span>请登录</span>
           </router-link>
         </div>
+      </div>
+    </div>
+
+    <!-- 第二行：导航链接 -->
+    <div class="nav-links-bar">
+      <div class="nav-links-inner">
+        <router-link to="/" class="nav-link"><el-icon :size="14"><HomeFilled /></el-icon> 首页</router-link>
+        <router-link to="/seckill" class="nav-link seckill-link"><el-icon :size="14"><Lightning /></el-icon> 秒杀</router-link>
+        <router-link to="/category/1" class="nav-link">数码家电</router-link>
+        <router-link to="/category/2" class="nav-link">服饰鞋包</router-link>
+        <router-link to="/category/3" class="nav-link">家居日用</router-link>
+        <router-link to="/category/4" class="nav-link">食品饮料</router-link>
+        <router-link to="/category/5" class="nav-link">美妆个护</router-link>
+        <router-link to="/category/6" class="nav-link">运动户外</router-link>
+        <router-link to="/category/7" class="nav-link">母婴玩具</router-link>
+        <router-link to="/orders" class="nav-link">我的订单</router-link>
+        <router-link to="/coupons" class="nav-link">领券中心</router-link>
       </div>
     </div>
   </div>
@@ -193,18 +161,16 @@ function handleLogout() {
 <style scoped>
 .navbar { position: sticky; top: 0; z-index: 100; width: 100%; }
 
-.main-nav {
-  background: linear-gradient(135deg, #e1251b 0%, #ff4e3a 50%, #e1251b 100%);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-  width: 100%;
+/* ========== 第一行：白底 header ========== */
+.nav-top {
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
 }
-.main-nav-inner {
+.nav-top-inner {
   display: flex;
   align-items: center;
-  height: 64px;
-  gap: 20px;
-  width: 100%;
-  margin: 0;
+  height: 60px;
+  gap: 24px;
   padding: 0 20px;
 }
 
@@ -212,124 +178,77 @@ function handleLogout() {
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
-  color: #fff !important;
-  margin-left: 24px;
+  text-decoration: none;
+  color: #333 !important;
 }
 .logo-img {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
-  border-radius: 10px;
-  flex-shrink: 0;
+  border-radius: 8px;
 }
 .logo-text { display: flex; flex-direction: column; }
-.logo-name { font-size: 22px; font-weight: bold; letter-spacing: 1px; line-height: 1.2; }
-.logo-slogan { font-size: 10px; opacity: 0.8; letter-spacing: 2px; }
-
-/* 导航链接 */
-.nav-links { display: flex; gap: 2px; }
-.nav-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  color: rgba(255,255,255,0.85) !important;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s;
-  position: relative;
-  letter-spacing: 0.5px;
-}
-.nav-link:hover {
-  background: rgba(255,255,255,0.18);
-  color: #fff !important;
-  transform: translateY(-1px);
-}
-.nav-link.router-link-exact-active {
-  background: rgba(255,255,255,0.22);
-  color: #fff !important;
-  font-weight: 600;
-}
-.nav-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  transition: all 0.3s;
-}
-.nav-link:hover .nav-icon { background: rgba(255,255,255,0.3); transform: scale(1.1); }
-.seckill-icon { background: rgba(255,215,0,0.25); color: #ffd700; }
-.seckill-link { font-weight: bold; }
-.hot-dot {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 8px;
-  height: 8px;
-  background: #ffd700;
-  border-radius: 50%;
-  animation: pulse 1.5s infinite;
-}
+.logo-name { font-size: 20px; font-weight: 700; color: #e1251b; line-height: 1.2; }
+.logo-slogan { font-size: 10px; color: #999; letter-spacing: 1px; }
 
 /* 搜索框 */
-.nav-search-wrapper { flex: 1; max-width: 460px; position: relative; }
-.nav-search {
+.search-wrapper {
+  flex: 1;
+  max-width: 520px;
+  position: relative;
+}
+.search-box {
   display: flex;
   align-items: center;
-  background: rgba(255,255,255,0.95);
-  border-radius: 24px;
-  overflow: visible;
+  border: 2px solid #ff6700;
+  border-radius: 22px;
+  overflow: hidden;
   transition: all 0.3s;
-  border: 2px solid transparent;
 }
-.nav-search.focused {
-  border-color: #ffd700;
-  box-shadow: 0 0 20px rgba(255,215,0,0.4);
+.search-box.focused {
+  border-color: #e1251b;
+  box-shadow: 0 0 0 2px rgba(225,37,27,0.1);
 }
-.search-icon { padding: 0 12px; color: #999; }
 .search-input {
   flex: 1;
-  height: 38px;
+  height: 36px;
   border: none;
   background: transparent;
-  font-size: 14px;
+  font-size: 13px;
   outline: none;
   color: #333;
+  padding: 0 14px;
 }
+.search-input::placeholder { color: #bbb; }
 .search-btn {
-  height: 38px;
-  width: 52px;
+  height: 36px;
+  padding: 0 20px;
   background: linear-gradient(135deg, #ff6700, #e1251b);
   color: #fff;
   border: none;
-  border-radius: 0 22px 22px 0;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: all 0.3s;
+  white-space: nowrap;
 }
-.search-btn:hover { filter: brightness(1.1); }
+.search-btn:hover { filter: brightness(1.05); }
 
-/* 搜索历史 */
-.search-history {
+/* 搜索下拉 */
+.search-dropdown {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   right: 0;
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-  padding: 8px 0;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+  padding: 6px 0;
   z-index: 200;
 }
-.history-header {
+.dropdown-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -337,87 +256,68 @@ function handleLogout() {
   font-size: 12px;
   color: #999;
 }
-.clear-btn {
-  cursor: pointer;
-  color: #e1251b;
-  font-size: 12px;
-}
+.clear-btn { cursor: pointer; color: #e1251b; font-size: 12px; }
 .clear-btn:hover { text-decoration: underline; }
-.history-item {
+.dropdown-item {
   padding: 8px 14px;
   font-size: 13px;
   color: #666;
   cursor: pointer;
   display: flex;
   align-items: center;
+  gap: 8px;
   transition: background 0.2s;
 }
-.history-item:hover { background: #f5f5f5; color: #333; }
+.dropdown-item:hover { background: #f5f5f5; color: #333; }
 
-/* 右侧区域 */
-.nav-right {
+/* 右侧按钮 */
+.nav-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   flex-shrink: 0;
-  margin-left: auto;
 }
-
-.cart-icon { color: #fff !important; }
-.icon-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.15);
+.action-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #fff;
-}
-.cart-icon:hover .icon-circle {
-  background: rgba(255,255,255,0.3);
-  transform: translateY(-3px);
-}
-
-/* 头像区域 */
-.avatar-area {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 4px 10px 4px 4px;
-  border-radius: 24px;
-  transition: background 0.2s;
-}
-.avatar-area:hover { background: rgba(255,255,255,0.15); }
-.avatar-circle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  border: 2px solid rgba(255,255,255,0.4);
-}
-.avatar-name {
-  color: #fff;
-  font-size: 13px;
-  max-width: 80px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.avatar-arrow { color: rgba(255,255,255,0.7); font-size: 12px; }
-
-.login-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #fff !important;
+  gap: 2px;
+  color: #666 !important;
   text-decoration: none;
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 4px 8px;
+  border-radius: 6px;
 }
+.action-item:hover { color: #e1251b !important; background: #fff5f5; }
+
+/* ========== 第二行：导航链接 ========== */
+.nav-links-bar {
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+.nav-links-inner {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  gap: 0;
+  padding: 0 20px;
+  overflow-x: auto;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  color: #666 !important;
+  text-decoration: none;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: color 0.2s;
+  border-radius: 4px;
+}
+.nav-link:hover { color: #e1251b !important; background: #fff5f5; }
+.nav-link.router-link-exact-active { color: #e1251b !important; font-weight: 600; }
+.seckill-link { color: #e1251b !important; font-weight: 600; }
 </style>

@@ -392,6 +392,11 @@ onUnmounted(() => {
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   position: relative;
   z-index: 1;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hero-section:hover {
+  transform: scale(1.015);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
 }
 
 .category-sidebar {
@@ -555,6 +560,12 @@ onUnmounted(() => {
   background: #fff;
   border: 1px solid #f0f0f0;
   border-left: 4px solid #e1251b;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 8px;
+}
+.seckill-banner:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(225,37,27,0.12);
 }
 .seckill-left {
   display: flex;
@@ -600,7 +611,8 @@ onUnmounted(() => {
 .seckill-more:hover { transform: translateX(4px); }
 
 /* ========== Section ========== */
-.section { margin-top: 16px; }
+.section { margin-top: 16px; transition: transform 0.3s ease; }
+.section:hover { transform: scale(1.015); }
 .section-header {
   display: flex;
   justify-content: space-between;

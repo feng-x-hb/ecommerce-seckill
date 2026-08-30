@@ -404,6 +404,8 @@ onUnmounted(() => {
   width: 185px;
   background: linear-gradient(180deg, #2c2c2c, #1a1a1a);
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 .sidebar-header {
   padding: 8px 12px;
@@ -426,6 +428,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 6px;
   border-left: 3px solid transparent;
+  flex: 1;
 }
 .cat-item:hover, .cat-item.active {
   background: linear-gradient(90deg, rgba(225,37,27,0.15), transparent);

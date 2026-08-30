@@ -121,17 +121,6 @@ onUnmounted(() => {
 
 <template>
   <div class="home-page">
-    <!-- ========== 背景飘浮粒子 ========== -->
-    <div class="bg-particles">
-      <span class="particle" v-for="i in 15" :key="i" :style="{
-        left: (i * 7) % 100 + '%',
-        animationDelay: (i * 0.7) + 's',
-        animationDuration: (8 + i % 5 * 2) + 's',
-        fontSize: (8 + i % 4 * 4) + 'px',
-        opacity: 0.1 + (i % 3) * 0.05
-      }">{{ ['✦','◆','●','★','♦'][i % 5] }}</span>
-    </div>
-
     <!-- ========== 顶部通知条 ========== -->
     <div class="notice-bar">
       <div class="notice-inner container">
@@ -184,11 +173,6 @@ onUnmounted(() => {
               立即查看 <el-icon><ArrowRight /></el-icon>
             </router-link>
           </div>
-          <!-- 装饰 -->
-          <div class="deco-circle deco-1"></div>
-          <div class="deco-circle deco-2"></div>
-          <div class="deco-circle deco-3"></div>
-          <div class="deco-ring deco-4"></div>
           <!-- 轮播指示器 -->
           <div class="banner-dots">
             <span v-for="(_, i) in banners" :key="i" class="dot" :class="{ active: i === bannerIndex }" @click="bannerIndex = i" />
@@ -198,7 +182,7 @@ onUnmounted(() => {
 
       <!-- 右侧信息卡 -->
       <div class="side-cards">
-        <div class="side-card gradient-animated">
+        <div class="side-card" style="background:linear-gradient(135deg,#e1251b,#ff6700)">
           <div class="side-icon-wrap"><el-icon :size="24"><Timer /></el-icon></div>
           <div>
             <div class="side-card-title">限时秒杀</div>
@@ -233,7 +217,7 @@ onUnmounted(() => {
     <div class="section container">
       <div class="seckill-banner card">
         <div class="seckill-left">
-          <div class="flash-badge animate-pulse">⚡</div>
+          <div class="flash-badge">⚡</div>
           <div>
             <h3 class="seckill-title">限时秒杀</h3>
             <p class="seckill-sub">每日精选 限时限量</p>
@@ -295,9 +279,13 @@ onUnmounted(() => {
         <div v-for="(p, i) in hotProducts" :key="p.id" class="hot-card card hover-lift" :style="{ animationDelay: i * 0.15 + 's' }">
           <div class="hot-rank" :class="'rank-' + (i+1)">{{ i + 1 }}</div>
           <router-link :to="`/product/${p.id}`">
-            <div class="hot-image" :style="{ background: `hsl(${p.id * 47 % 360}, 60%, 85%)` }">
+            <div class="hot-image" :style="{ background: `linear-gradient(135deg, hsl(${p.id * 47 % 360}, 55%, 88%), hsl(${p.id * 47 % 360 + 30}, 55%, 80%))` }">
               <img v-if="p.mainImage" :src="p.mainImage" :alt="p.title" class="hot-img" @error="($event.target as HTMLImageElement).style.display='none'" />
-              <span v-if="!p.mainImage">{{ p.title.charAt(0) }}</span>
+              <svg v-if="!p.mainImage" class="hot-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="12" y="16" width="40" height="32" rx="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+                <path d="M16 40 L24 30 L30 36 L42 22 L48 30" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+                <circle cx="22" cy="26" r="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+              </svg>
             </div>
             <div class="hot-info">
               <div class="hot-name ellipsis">{{ p.title }}</div>
@@ -343,7 +331,7 @@ onUnmounted(() => {
       </div>
 
       <div v-if="!loading && products.length === 0" class="empty-state">
-        <div class="empty-icon animate-float">📦</div>
+        <div class="empty-icon">📦</div>
         <p>暂无商品</p>
       </div>
 
@@ -362,28 +350,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.home-page { padding-bottom: 40px; position: relative; overflow: hidden; }
-
-/* ========== 背景粒子 ========== */
-.bg-particles {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-.particle {
-  position: absolute;
-  top: -20px;
-  color: #e1251b;
-  animation: particleFall linear infinite;
-}
-@keyframes particleFall {
-  0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.15; }
-  90% { opacity: 0.15; }
-  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-}
+.home-page { padding-bottom: 40px; }
 
 /* ========== 通知条 ========== */
 .notice-bar {
@@ -426,18 +393,8 @@ onUnmounted(() => {
   margin: 16px auto;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   position: relative;
-  z-index: 1;
-}
-.hero-section::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(225,37,27,0.05), transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255,103,0,0.05), transparent 50%);
-  pointer-events: none;
   z-index: 1;
 }
 
@@ -469,11 +426,10 @@ onUnmounted(() => {
   border-left: 3px solid transparent;
 }
 .cat-item:hover, .cat-item.active {
-  background: linear-gradient(90deg, rgba(225,37,27,0.2), transparent);
+  background: linear-gradient(90deg, rgba(225,37,27,0.15), transparent);
   color: #fff;
   padding-left: 20px;
   border-left-color: #e1251b;
-  text-shadow: 0 0 8px rgba(255,255,255,0.3);
 }
 .cat-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
 .cat-name { flex: 1; }
@@ -547,23 +503,6 @@ onUnmounted(() => {
 }
 .banner-btn:hover { background: #fff; color: #333; transform: translateX(4px); }
 
-.deco-circle {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-}
-.deco-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.1);
-  background: transparent;
-}
-.deco-1 { width: 200px; height: 200px; top: -50px; right: 100px; animation: float 6s ease-in-out infinite; }
-.deco-2 { width: 120px; height: 120px; bottom: -30px; right: 200px; animation: float 4s ease-in-out infinite 1s; }
-.deco-3 { width: 80px; height: 80px; top: 50px; right: 50px; animation: float 5s ease-in-out infinite 0.5s; }
-.deco-4 { width: 160px; height: 160px; top: 20px; right: 150px; animation: spin 20s linear infinite; }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
 .banner-dots {
   position: absolute;
   bottom: 16px;
@@ -623,19 +562,10 @@ onUnmounted(() => {
   justify-content: space-between;
   padding: 20px 30px;
   margin-top: 20px;
-  background: linear-gradient(135deg, #fff5f5, #fff0f0);
-  border: 1px solid #ffe0e0;
+  background: #fff;
+  border: 1px solid #f0f0f0;
   border-left: 4px solid #e1251b;
   position: relative;
-  overflow: hidden;
-}
-.seckill-banner::after {
-  content: '';
-  position: absolute;
-  top: 0; right: 0; bottom: 0;
-  width: 200px;
-  background: linear-gradient(90deg, transparent, rgba(225,37,27,0.03));
-  pointer-events: none;
 }
 .seckill-left {
   display: flex;
@@ -651,7 +581,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  box-shadow: 0 4px 16px rgba(225,37,27,0.3);
 }
 .seckill-title { font-size: 20px; color: var(--jd-red); font-weight: bold; }
 .seckill-sub { font-size: 13px; color: #999; }
@@ -759,7 +688,7 @@ onUnmounted(() => {
   font-weight: bold;
   z-index: 1;
 }
-.rank-1 { background: linear-gradient(135deg, #e1251b, #ff4e3a); box-shadow: 0 2px 8px rgba(225,37,27,0.4); }
+.rank-1 { background: linear-gradient(135deg, #e1251b, #ff4e3a); }
 .rank-2 { background: linear-gradient(135deg, #ff6700, #ff9500); }
 .rank-3 { background: linear-gradient(135deg, #f5a623, #f7c948); }
 
@@ -788,6 +717,7 @@ onUnmounted(() => {
   color: rgba(255,255,255,0.7);
   font-weight: bold;
 }
+.hot-svg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 48px; height: 48px; color: rgba(255,255,255,0.6); }
 .hot-name { font-size: 13px; margin-bottom: 4px; }
 
 .empty-state { text-align: center; padding: 80px 0; color: #ccc; }

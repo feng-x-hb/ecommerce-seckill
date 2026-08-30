@@ -123,7 +123,7 @@ function onMouseLeave() {
 .card-image {
   position: relative;
   width: 100%;
-  padding-top: 85%;
+  padding-top: 75%;
   overflow: hidden;
 }
 .placeholder-img {
@@ -206,18 +206,18 @@ function onMouseLeave() {
 }
 
 /* 卡片内容 */
-.card-body { padding: 10px 10px 12px; }
+.card-body { padding: 8px; }
 .card-title {
-  font-size: 13px;
-  line-height: 1.4;
-  height: 34px;
-  margin-bottom: 6px;
+  font-size: 12px;
+  line-height: 1.3;
+  height: 30px;
+  margin-bottom: 4px;
   color: var(--jd-text, #333);
 }
 .card-price {
   display: flex;
   align-items: baseline;
-  margin-bottom: var(--sp-2, 8px);
+  margin-bottom: 4px;
 }
 .price-symbol { font-size: 13px; color: var(--jd-red, #e1251b); }
 .price-decimal { font-size: 12px; color: var(--jd-red, #e1251b); }

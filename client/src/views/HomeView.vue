@@ -28,10 +28,10 @@ const loading = ref(false)
 // 轮播
 const bannerIndex = ref(0)
 const banners = [
-  { gradient: 'linear-gradient(135deg, #e1251b 0%, #ff6700 100%)', icon: '🔥', title: '超级秒杀', sub: '限时限量 抢完即止', tag: '限时', link: '/seckill' },
-  { gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', icon: '📱', title: '新品首发', sub: 'iPhone 15 Pro Max 震撼上市', tag: '新品', link: '/search?keyword=新品' },
-  { gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', icon: '🎁', title: '品质生活', sub: '精选好物 品质保证', tag: '精选', link: '/coupons' },
-  { gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', icon: '💰', title: '数码狂欢', sub: '爆款直降 限时优惠', tag: '特惠', link: '/category/1' }
+  { image: '/images/banner1.png', title: '超级秒杀', sub: '限时限量 抢完即止', tag: '限时', link: '/seckill' },
+  { image: '/images/banner2.png', title: '新品首发', sub: '潮流新品 震撼上市', tag: '新品', link: '/search?keyword=新品' },
+  { image: '/images/banner3.png', title: '品质生活', sub: '精选好物 品质保证', tag: '精选', link: '/coupons' },
+  { image: '/images/banner4.png', title: '数码狂欢', sub: '爆款直降 限时优惠', tag: '特惠', link: '/category/1' }
 ]
 
 // 倒计时
@@ -169,10 +169,10 @@ onUnmounted(() => {
         <button class="banner-arrow banner-arrow-right" @click="bannerNext">
           <el-icon :size="20"><ArrowRight /></el-icon>
         </button>
-        <div class="banner-slide" :style="{ background: banners[bannerIndex].gradient }">
+        <div class="banner-slide">
+          <img :src="banners[bannerIndex].image" :alt="banners[bannerIndex].title" class="banner-img" />
           <div class="banner-content animate-fade-in" :key="bannerIndex">
             <div class="banner-tag">{{ banners[bannerIndex].tag }}</div>
-            <div class="banner-icon">{{ banners[bannerIndex].icon }}</div>
             <h2 class="banner-title">{{ banners[bannerIndex].title }}</h2>
             <p class="banner-sub">{{ banners[bannerIndex].sub }}</p>
             <router-link :to="banners[bannerIndex].link" class="banner-btn">
@@ -470,6 +470,23 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   overflow: hidden;
+  background: #f5f5f5;
+}
+.banner-img {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+.banner-slide::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+  z-index: 2;
+  pointer-events: none;
 }
 .banner-content {
   position: relative;
@@ -487,9 +504,8 @@ onUnmounted(() => {
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.3);
 }
-.banner-icon { font-size: 36px; margin-bottom: 8px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
-.banner-title { font-size: 28px; font-weight: bold; margin-bottom: 6px; text-shadow: 0 3px 12px rgba(0,0,0,0.25); }
-.banner-sub { font-size: 14px; opacity: 0.9; margin-bottom: 14px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+.banner-title { font-size: 28px; font-weight: bold; margin-bottom: 6px; text-shadow: 0 3px 12px rgba(0,0,0,0.4); }
+.banner-sub { font-size: 14px; opacity: 0.95; margin-bottom: 14px; text-shadow: 0 1px 6px rgba(0,0,0,0.3); }
 .banner-btn {
   padding: 7px 20px;
   background: rgba(255,255,255,0.2);

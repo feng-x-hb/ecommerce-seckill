@@ -392,11 +392,6 @@ onUnmounted(() => {
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   position: relative;
   z-index: 1;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.hero-section:hover {
-  transform: scale(1.015);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
 }
 
 .category-sidebar {
@@ -479,7 +474,9 @@ onUnmounted(() => {
   height: 100%;
   object-fit: cover;
   z-index: 1;
+  transition: transform 0.4s ease;
 }
+.banner-wrapper:hover .banner-img { transform: scale(1.04); }
 .banner-slide::after {
   content: '';
   position: absolute;
@@ -611,8 +608,7 @@ onUnmounted(() => {
 .seckill-more:hover { transform: translateX(4px); }
 
 /* ========== Section ========== */
-.section { margin-top: 16px; transition: transform 0.3s ease; }
-.section:hover { transform: scale(1.015); }
+.section { margin-top: 16px; }
 .section-header {
   display: flex;
   justify-content: space-between;

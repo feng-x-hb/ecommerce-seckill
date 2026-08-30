@@ -194,7 +194,16 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException("用户不存在");
         }
         if (profileDTO.getNickname() != null && !profileDTO.getNickname().isBlank()) {
-            user.setNickname(profileDTO.getNickname());
+            String newNickname = profileDTO.getNickname().trim();
+            if (!newNickname.equals(user.getNickname())) {
+                Long count = userMapper.selectCount(
+                        new LambdaQueryWrapper<User>()
+                                .eq(User::getNickname, newNickname));
+                if (count > 0) {
+                    throw new BusinessException("该昵称已被使用");
+                }
+            }
+            user.setNickname(newNickname);
         }
         if (profileDTO.getAvatar() != null) {
             user.setAvatar(profileDTO.getAvatar());

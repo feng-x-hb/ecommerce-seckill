@@ -47,13 +47,29 @@ public class ProductServiceImpl implements ProductService {
             wrapper.eq(Product::getCategoryId, categoryId);
         }
 
-        // 按关键词模糊搜索（标题包含关键词）
+        // 模糊搜索：拆词 + REGEXP OR 匹配 + 相关度排序
         if (keyword != null && !keyword.trim().isEmpty()) {
-            wrapper.like(Product::getTitle, keyword.trim());
+            String trimmed = keyword.trim();
+            // 拆成单字：中文按字拆，英文按空格拆单词
+            String[] tokens = trimmed.split("\\s+");
+            // 构建 REGEXP 模式：苹|果|手|机|phone
+            String regexpPattern = String.join("|", tokens);
+            wrapper.apply("title REGEXP {0}", regexpPattern);
+            // 相关度排序：匹配关键词数越多越靠前
+            // 用 LENGTH - LENGTH(REPLACE) 粗算匹配次数
+            StringBuilder relevanceExpr = new StringBuilder();
+            for (String token : tokens) {
+                relevanceExpr.append(" + LENGTH(title) - LENGTH(REPLACE(title, '")
+                        .append(token.replace("'", "\\'"))
+                        .append("', ''))");
+            }
+            wrapper.last("ORDER BY status ASC" + 
+                    ", (" + relevanceExpr.substring(3) + ") DESC" +
+                    ", sales DESC");
+        } else {
+            // 无关键词时按销量降序
+            wrapper.orderByDesc(Product::getSales);
         }
-
-        // 按销量降序排
-        wrapper.orderByDesc(Product::getSales);
 
         // 分页查询
         Page<Product> pageResult = productMapper.selectPage(new Page<>(page, size), wrapper);
@@ -112,9 +128,12 @@ public class ProductServiceImpl implements ProductService {
         if (keyword == null || keyword.isBlank()) {
             return List.of();
         }
+        String trimmed = keyword.trim();
+        String[] tokens = trimmed.split("\\s+");
+        String regexpPattern = String.join("|", tokens);
         List<Product> products = productMapper.selectList(
             new LambdaQueryWrapper<Product>()
-                .like(Product::getTitle, keyword)
+                .apply("title REGEXP {0}", regexpPattern)
                 .eq(Product::getStatus, 1)
                 .last("LIMIT 10")
         );

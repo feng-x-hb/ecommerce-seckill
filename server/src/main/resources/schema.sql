@@ -278,3 +278,8 @@ UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE na
 UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE name='美妆个护' AND parent_id=0) AS t) WHERE category_id=6;
 UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE name='运动户外' AND parent_id=0) AS t) WHERE category_id=8;
 UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE name='母婴玩具' AND parent_id=0) AS t) WHERE category_id IN (9,10);
+
+-- ==================== 迁移：确保 signature 列存在 ====================
+SET @col_exists = (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'signature');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE user ADD COLUMN signature VARCHAR(200) DEFAULT NULL', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;

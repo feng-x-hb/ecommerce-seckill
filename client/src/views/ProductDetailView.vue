@@ -272,7 +272,7 @@ onMounted(async () => {
   transition: all 0.2s;
   position: relative;
 }
-.sku-item:hover { border-color: var(--jd-red); color: var(--jd-red); }
+.sku-item:hover { border-color: var(--jd-red); color: var(--jd-red); transform: scale(1.06); }
 .sku-item.active { border-color: var(--jd-red); color: var(--jd-red); background: #fff0f0; }
 .sku-item.disabled { color: #ccc; border-color: #eee; cursor: not-allowed; }
 .sku-stock {

@@ -183,7 +183,9 @@ function handleLogout() {
   text-decoration: none;
   color: var(--jd-text, #333) !important;
   z-index: 2;
+  transition: transform 0.25s ease;
 }
+.logo:hover { transform: translateY(-50%) scale(1.08); }
 .logo-img {
   width: 72px;
   height: 72px;
@@ -296,11 +298,11 @@ function handleLogout() {
   text-decoration: none;
   font-size: 11px;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.25s ease;
   padding: 4px 8px;
   border-radius: 6px;
 }
-.action-item:hover { color: #e1251b !important; background: rgba(225,37,27,0.08); }
+.action-item:hover { color: #e1251b !important; background: rgba(225,37,27,0.08); transform: scale(1.1); }
 
 /* ========== 导航链接 — 下半行，15%~85% ========== */
 .nav-links-row {
@@ -324,10 +326,10 @@ function handleLogout() {
   text-decoration: none;
   font-size: 13px;
   white-space: nowrap;
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.25s ease;
   border-radius: 4px;
 }
-.nav-link:hover { color: #e1251b !important; background: rgba(225,37,27,0.08); }
+.nav-link:hover { color: #e1251b !important; background: rgba(225,37,27,0.08); transform: scale(1.08); }
 .nav-link.router-link-exact-active { color: #e1251b !important; font-weight: 600; }
 .seckill-link { color: #e1251b !important; font-weight: 600; }
 </style>

@@ -287,7 +287,7 @@ async function handleSubmit() {
   cursor: pointer;
   transition: all 0.2s;
 }
-.coupon-card:hover { border-color: #ff9900; }
+.coupon-card:hover { border-color: #ff9900; transform: scale(1.02); }
 .coupon-card.active { border-color: #e1251b; background: #fff5f5; }
 .coupon-card.disabled { opacity: 0.5; cursor: not-allowed; }
 

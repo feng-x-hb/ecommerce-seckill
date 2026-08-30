@@ -170,7 +170,7 @@ const catEmojis: Record<string, string> = {
   padding: 6px 20px; border-radius: 20px; font-size: 13px; cursor: pointer;
   background: #fff; color: #666; border: 1px solid #eee; transition: all 0.3s;
 }
-.sub-tag:hover { border-color: #e1251b; color: #e1251b; }
+.sub-tag:hover { border-color: #e1251b; color: #e1251b; transform: scale(1.06); }
 .sub-tag.active {
   background: linear-gradient(135deg, #e1251b, #ff6700); color: #fff; border-color: transparent;
 }

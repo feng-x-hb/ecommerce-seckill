@@ -278,7 +278,7 @@ onMounted(fetchOrders)
   justify-content: center;
   gap: 6px;
 }
-.tab-item:hover { color: var(--jd-red); background: #fff8f8; }
+.tab-item:hover { color: var(--jd-red); background: #fff8f8; transform: scale(1.05); }
 .tab-item.active {
   color: var(--jd-red);
   border-bottom-color: var(--jd-red);
@@ -300,6 +300,7 @@ onMounted(fetchOrders)
 }
 .order-card:hover {
   box-shadow: var(--jd-shadow-hover, 0 8px 24px rgba(0,0,0,0.12));
+  transform: translateY(-3px);
 }
 .status-bar {
   height: 4px;

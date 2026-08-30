@@ -429,6 +429,7 @@ onUnmounted(() => {
   color: #fff;
   padding-left: 16px;
   border-left-color: #e1251b;
+  transform: translateX(4px);
 }
 .cat-name { flex: 1; }
 .cat-arrow { opacity: 0; transition: all 0.3s; transform: translateX(-4px); }
@@ -471,7 +472,7 @@ onUnmounted(() => {
   top: 0; left: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   z-index: 1;
 }
 .banner-slide::after {
@@ -640,7 +641,7 @@ onUnmounted(() => {
   border: 1px solid #eee;
   transition: all 0.3s;
 }
-.filter-tag:hover { color: var(--jd-red); border-color: var(--jd-red); }
+.filter-tag:hover { color: var(--jd-red); border-color: var(--jd-red); transform: scale(1.08); }
 .filter-tag.active { background: var(--jd-red); color: #fff; border-color: var(--jd-red); }
 
 .product-grid {
@@ -659,7 +660,10 @@ onUnmounted(() => {
   position: relative;
   padding: 10px;
   cursor: pointer;
+  transition: transform 0.25s ease;
+  border-radius: 8px;
 }
+.hot-card:hover { transform: scale(1.04); }
 .hot-rank {
   position: absolute;
   top: 6px;

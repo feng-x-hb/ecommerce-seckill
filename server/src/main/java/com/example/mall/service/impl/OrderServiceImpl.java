@@ -237,6 +237,28 @@ public class OrderServiceImpl implements OrderService {
         return vo;
     }
 
+    @Override
+    public void updateAddress(Long userId, String orderNo,
+                              String receiverName, String receiverPhone, String receiverAddress) {
+        Order order = getOrderOrThrow(userId, orderNo);
+        if (order.getStatus() != 0) {
+            throw new BusinessException("只有待支付订单可以修改地址");
+        }
+        if (receiverName == null || receiverName.isBlank()) {
+            throw new BusinessException("收货人不能为空");
+        }
+        if (receiverPhone == null || receiverPhone.isBlank()) {
+            throw new BusinessException("联系电话不能为空");
+        }
+        if (receiverAddress == null || receiverAddress.isBlank()) {
+            throw new BusinessException("收货地址不能为空");
+        }
+        order.setReceiverName(receiverName.trim());
+        order.setReceiverPhone(receiverPhone.trim());
+        order.setReceiverAddress(receiverAddress.trim());
+        orderMapper.updateById(order);
+    }
+
     /** 查订单，不存在或不属于当前用户则报错 */
     private Order getOrderOrThrow(Long userId, String orderNo) {
         Order order = orderMapper.selectOne(

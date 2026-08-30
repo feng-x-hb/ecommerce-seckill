@@ -89,4 +89,19 @@ public class OrderController {
         OrderDetailVO detail = orderService.detail(userId, orderNo);
         return Result.success(detail);
     }
+
+    /**
+     * 修改收货地址（仅待支付状态）
+     * PUT /api/order/{orderNo}/address
+     */
+    @PutMapping("/{orderNo}/address")
+    public Result<Void> updateAddress(@RequestAttribute("userId") Long userId,
+                                      @PathVariable String orderNo,
+                                      @RequestBody Map<String, String> body) {
+        orderService.updateAddress(userId, orderNo,
+                body.get("receiverName"),
+                body.get("receiverPhone"),
+                body.get("receiverAddress"));
+        return Result.success(null);
+    }
 }

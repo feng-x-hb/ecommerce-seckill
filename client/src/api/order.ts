@@ -30,3 +30,12 @@ export function getOrderList(params: { page?: number; size?: number; status?: nu
 export function getOrderDetail(orderNo: string) {
   return request.get(`/order/${orderNo}`)
 }
+
+/** 修改收货地址 */
+export function updateOrderAddress(orderNo: string, data: {
+  receiverName: string
+  receiverPhone: string
+  receiverAddress: string
+}) {
+  return request.put(`/order/${orderNo}/address`, data)
+}

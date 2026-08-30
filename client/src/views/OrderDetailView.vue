@@ -5,7 +5,7 @@
  */
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getOrderDetail, payOrder, cancelOrder } from '@/api/order'
+import { getOrderDetail, payOrder, cancelOrder, updateOrderAddress } from '@/api/order'
 import type { OrderDetail } from '@/types'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -13,6 +13,43 @@ const route = useRoute()
 const router = useRouter()
 const order = ref<OrderDetail | null>(null)
 const loading = ref(true)
+
+// 地址编辑弹窗
+const showAddressDialog = ref(false)
+const editForm = ref({ receiverName: '', receiverPhone: '', receiverAddress: '' })
+const addressSaving = ref(false)
+
+function openAddressDialog() {
+  if (!order.value) return
+  editForm.value = {
+    receiverName: order.value.receiverName,
+    receiverPhone: order.value.receiverPhone,
+    receiverAddress: order.value.receiverAddress
+  }
+  showAddressDialog.value = true
+}
+
+async function handleAddressSave() {
+  const { receiverName, receiverPhone, receiverAddress } = editForm.value
+  if (!receiverName.trim()) return ElMessage.warning('请输入收货人姓名')
+  if (!receiverPhone.trim()) return ElMessage.warning('请输入联系电话')
+  if (!receiverAddress.trim()) return ElMessage.warning('请输入收货地址')
+  addressSaving.value = true
+  try {
+    await updateOrderAddress(route.params.orderNo as string, {
+      receiverName: receiverName.trim(),
+      receiverPhone: receiverPhone.trim(),
+      receiverAddress: receiverAddress.trim()
+    })
+    ElMessage.success('地址修改成功')
+    showAddressDialog.value = false
+    fetchDetail()
+  } catch {
+    ElMessage.error('修改失败')
+  } finally {
+    addressSaving.value = false
+  }
+}
 
 const statusMap: Record<number, { text: string; color: string; icon: string }> = {
   0: { text: '待支付', color: '#e1251b', icon: '⏳' },
@@ -80,13 +117,37 @@ onMounted(fetchDetail)
 
       <!-- 收货信息 -->
       <div class="section card">
-        <h3 class="section-title">收货信息</h3>
+        <div class="section-header">
+          <h3 class="section-title">收货信息</h3>
+          <el-button v-if="order.status === 0" type="primary" link @click="openAddressDialog">
+            修改地址
+          </el-button>
+        </div>
         <div class="info-grid">
           <div><span class="label">收货人：</span>{{ order.receiverName }}</div>
           <div><span class="label">联系电话：</span>{{ order.receiverPhone }}</div>
           <div class="full"><span class="label">收货地址：</span>{{ order.receiverAddress }}</div>
         </div>
       </div>
+
+      <!-- 修改地址弹窗 -->
+      <el-dialog v-model="showAddressDialog" title="修改收货地址" width="480px" :close-on-click-modal="false">
+        <el-form label-width="80px" label-position="right">
+          <el-form-item label="收货人">
+            <el-input v-model="editForm.receiverName" placeholder="请输入收货人姓名" maxlength="20" />
+          </el-form-item>
+          <el-form-item label="联系电话">
+            <el-input v-model="editForm.receiverPhone" placeholder="请输入手机号" maxlength="11" />
+          </el-form-item>
+          <el-form-item label="收货地址">
+            <el-input v-model="editForm.receiverAddress" type="textarea" :rows="3" placeholder="请输入详细地址" maxlength="200" />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <el-button @click="showAddressDialog = false">取消</el-button>
+          <el-button type="primary" :loading="addressSaving" @click="handleAddressSave">确认修改</el-button>
+        </template>
+      </el-dialog>
 
       <!-- 商品清单 -->
       <div class="section card">
@@ -155,12 +216,18 @@ onMounted(fetchDetail)
 .status-actions { margin-left: auto; display: flex; gap: 10px; }
 
 .section { margin-bottom: 20px; padding: 24px; }
-.section-title {
-  font-size: 16px;
-  font-weight: bold;
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 16px;
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
+}
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
 }
 
 .info-grid {

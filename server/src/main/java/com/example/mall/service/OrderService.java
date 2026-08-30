@@ -36,4 +36,8 @@ public interface OrderService {
 
     /** 订单详情 */
     OrderDetailVO detail(Long userId, String orderNo);
+
+    /** 修改收货地址（仅待支付状态可改） */
+    void updateAddress(Long userId, String orderNo,
+                       String receiverName, String receiverPhone, String receiverAddress);
 }

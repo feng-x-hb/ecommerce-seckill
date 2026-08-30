@@ -25,10 +25,10 @@ const loading = ref(false)
 // 轮播
 const bannerIndex = ref(0)
 const banners = [
-  { gradient: 'linear-gradient(135deg, #e1251b, #ff6700)', icon: '🔥', title: '超级秒杀', sub: '限时限量 抢完即止', tag: '限时' },
-  { gradient: 'linear-gradient(135deg, #667eea, #764ba2)', icon: '📱', title: '新品首发', sub: 'iPhone 15 Pro Max 震撼上市', tag: '新品' },
-  { gradient: 'linear-gradient(135deg, #f093fb, #f5576c)', icon: '🎁', title: '品质生活', sub: '精选好物 品质保证', tag: '精选' },
-  { gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)', icon: '💰', title: '数码狂欢', sub: '爆款直降 限时优惠', tag: '特惠' }
+  { gradient: 'linear-gradient(135deg, #e1251b, #ff6700)', icon: '🔥', title: '超级秒杀', sub: '限时限量 抢完即止', tag: '限时', link: '/seckill' },
+  { gradient: 'linear-gradient(135deg, #667eea, #764ba2)', icon: '📱', title: '新品首发', sub: 'iPhone 15 Pro Max 震撼上市', tag: '新品', link: '/search?keyword=新品' },
+  { gradient: 'linear-gradient(135deg, #f093fb, #f5576c)', icon: '🎁', title: '品质生活', sub: '精选好物 品质保证', tag: '精选', link: '/coupons' },
+  { gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)', icon: '💰', title: '数码狂欢', sub: '爆款直降 限时优惠', tag: '特惠', link: '/category/1' }
 ]
 
 // 倒计时
@@ -180,9 +180,9 @@ onUnmounted(() => {
             <div class="banner-icon">{{ banners[bannerIndex].icon }}</div>
             <h2 class="banner-title">{{ banners[bannerIndex].title }}</h2>
             <p class="banner-sub">{{ banners[bannerIndex].sub }}</p>
-            <button class="banner-btn">
+            <router-link :to="banners[bannerIndex].link" class="banner-btn">
               立即查看 <el-icon><ArrowRight /></el-icon>
-            </button>
+            </router-link>
           </div>
           <!-- 装饰 -->
           <div class="deco-circle deco-1"></div>
@@ -543,6 +543,7 @@ onUnmounted(() => {
   gap: 6px;
   transition: all 0.3s;
   backdrop-filter: blur(8px);
+  text-decoration: none;
 }
 .banner-btn:hover { background: #fff; color: #333; transform: translateX(4px); }
 

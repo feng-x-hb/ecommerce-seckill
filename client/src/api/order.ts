@@ -6,6 +6,7 @@ export function createOrder(data: {
   receiverName: string
   receiverPhone: string
   receiverAddress: string
+  couponId?: number | null
 }) {
   return request.post('/order/create', data)
 }

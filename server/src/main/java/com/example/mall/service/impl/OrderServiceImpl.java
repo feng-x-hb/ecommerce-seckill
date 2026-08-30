@@ -35,19 +35,25 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemMapper orderItemMapper;
     private final SkuMapper skuMapper;
     private final ProductMapper productMapper;
+    private final UserCouponMapper userCouponMapper;
+    private final CouponTemplateMapper couponTemplateMapper;
 
     public OrderServiceImpl(OrderMapper orderMapper, OrderItemMapper orderItemMapper,
-                            SkuMapper skuMapper, ProductMapper productMapper) {
+                            SkuMapper skuMapper, ProductMapper productMapper,
+                            UserCouponMapper userCouponMapper, CouponTemplateMapper couponTemplateMapper) {
         this.orderMapper = orderMapper;
         this.orderItemMapper = orderItemMapper;
         this.skuMapper = skuMapper;
         this.productMapper = productMapper;
+        this.userCouponMapper = userCouponMapper;
+        this.couponTemplateMapper = couponTemplateMapper;
     }
 
     @Override
     @Transactional
     public String createOrder(Long userId, List<Map<String, Object>> skuItems,
-                              String receiverName, String receiverPhone, String receiverAddress) {
+                              String receiverName, String receiverPhone, String receiverAddress,
+                              Long couponId) {
         if (skuItems == null || skuItems.isEmpty()) {
             throw new BusinessException("请选择要结算的商品");
         }
@@ -94,14 +100,45 @@ public class OrderServiceImpl implements OrderService {
         String orderNo = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
                 + String.format("%06d", new Random().nextInt(999999));
 
-        // 7. 创建订单
+        // 7. 处理优惠券抵扣
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        if (couponId != null) {
+            UserCoupon userCoupon = userCouponMapper.selectById(couponId);
+            if (userCoupon == null || !userCoupon.getUserId().equals(userId)) {
+                throw new BusinessException("优惠券不存在");
+            }
+            if (userCoupon.getStatus() != 0) {
+                throw new BusinessException("该优惠券已使用或已过期");
+            }
+            CouponTemplate template = couponTemplateMapper.selectById(userCoupon.getTemplateId());
+            if (template == null || template.getStatus() != 1) {
+                throw new BusinessException("优惠券模板已失效");
+            }
+            // 检查有效期
+            java.time.LocalDate today = java.time.LocalDate.now();
+            if (today.isBefore(template.getStartDate()) || today.isAfter(template.getEndDate())) {
+                throw new BusinessException("优惠券不在有效期内");
+            }
+            // 检查最低消费
+            if (totalAmount.compareTo(template.getMinAmount()) < 0) {
+                throw new BusinessException("未达到优惠券最低消费 ¥" + template.getMinAmount());
+            }
+            // 计算折扣（不超过订单总额）
+            discountAmount = template.getDiscount().min(totalAmount);
+            // 标记优惠券已使用
+            userCoupon.setStatus(1);
+            userCoupon.setUsedAt(LocalDateTime.now());
+            userCouponMapper.updateById(userCoupon);
+        }
+
+        // 8. 创建订单
         Order order = new Order();
         order.setOrderNo(orderNo);
         order.setUserId(userId);
         order.setStatus(0); // 待支付
         order.setTotalAmount(totalAmount);
-        order.setDiscountAmount(BigDecimal.ZERO);
-        order.setPayAmount(totalAmount); // 暂无优惠
+        order.setDiscountAmount(discountAmount);
+        order.setPayAmount(totalAmount.subtract(discountAmount));
         order.setReceiverName(receiverName);
         order.setReceiverPhone(receiverPhone);
         order.setReceiverAddress(receiverAddress);

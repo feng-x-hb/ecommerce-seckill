@@ -2,28 +2,11 @@
 -- 商品种子数据（大量商品 + SKU）
 -- 用 INSERT IGNORE 保证幂等，重启不重复
 -- seller_id=2 对应 seller001 商家账号
+-- 新分类体系（7大类，schema.sql已建立）
+-- 数码家电=1,服饰鞋包=2,家居日用=3,食品饮料=4,美妆个护=5,运动户外=6,母婴玩具=7
 -- ============================================
 
--- ==================== 新增分类 ====================
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '美妆护肤', 5, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='美妆护肤' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '家居日用', 6, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='家居日用' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '运动户外', 7, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='运动户外' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '母婴玩具', 8, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='母婴玩具' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '图书文具', 9, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='图书文具' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '鞋靴箱包', 10, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='鞋靴箱包' AND parent_id=0);
-
--- 子分类
-INSERT INTO category (parent_id, name, sort, status) SELECT 6, '面部护肤', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='面部护肤' AND parent_id=6);
-INSERT INTO category (parent_id, name, sort, status) SELECT 6, '彩妆', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='彩妆' AND parent_id=6);
-INSERT INTO category (parent_id, name, sort, status) SELECT 7, '床上用品', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='床上用品' AND parent_id=7);
-INSERT INTO category (parent_id, name, sort, status) SELECT 7, '厨具', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='厨具' AND parent_id=7);
-INSERT INTO category (parent_id, name, sort, status) SELECT 8, '运动鞋服', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='运动鞋服' AND parent_id=8);
-INSERT INTO category (parent_id, name, sort, status) SELECT 8, '健身器材', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='健身器材' AND parent_id=8);
-INSERT INTO category (parent_id, name, sort, status) SELECT 3, '空调', 3, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='空调' AND parent_id=3);
-INSERT INTO category (parent_id, name, sort, status) SELECT 3, '冰箱', 4, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='冰箱' AND parent_id=3);
-INSERT INTO category (parent_id, name, sort, status) SELECT 3, '洗衣机', 5, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='洗衣机' AND parent_id=3);
-
--- ==================== 手机数码（category_id=1）====================
+-- ==================== 数码家电-智能手机（category_id=1）====================
 INSERT IGNORE INTO product (id, seller_id, category_id, title, subtitle, price, sales) VALUES
 (3, 2, 1, 'iPhone 16 Pro Max 512GB', 'A18 Pro芯片 钛金属设计', 12999.00, 520),
 (4, 2, 1, 'iPhone 16 256GB', 'A18芯片 超瓷晶面板', 7999.00, 830),
@@ -67,18 +50,18 @@ INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (27, 16, '颜色:赛道版,存储:256GB', 4499.00, 50),
 (28, 17, '颜色:黑色,存储:128GB', 5999.00, 100);
 
--- ==================== 电脑办公（category_id=2）====================
+-- ==================== 数码家电-笔记本电脑（category_id=1）====================
 INSERT IGNORE INTO product (id, seller_id, category_id, title, subtitle, price, sales) VALUES
-(18, 2, 2, 'MacBook Pro 16 M4 Max', '48GB+1TB 深空黑', 34999.00, 120),
-(19, 2, 2, 'MacBook Air 15 M4', '16GB+512GB 午夜色', 12999.00, 350),
-(20, 2, 2, 'ThinkPad X1 Carbon 2025', 'Ultra 7 32GB 超薄商务', 12999.00, 210),
-(21, 2, 2, '戴尔 XPS 15 2025', 'Ultra 7 2.5K OLED屏', 11999.00, 180),
-(22, 2, 2, '华为 MateBook X Pro', 'Ultra 7 32GB 3.1K屏', 11999.00, 260),
-(23, 2, 2, '小米笔记本 Pro 16 2025', 'Ultra 7 32GB 3.1K屏', 7999.00, 320),
-(24, 2, 2, '华硕 ROG 幻16 Air', 'Ultra 9 RTX5070 2.5K', 15999.00, 150),
-(25, 2, 2, '联想拯救者 Y9000P 2025', 'i9 RTX5070Ti 2.5K 240Hz', 12999.00, 280),
-(26, 2, 2, '戴尔 U2723QE 4K显示器', '27英寸 IPS Black Type-C', 4999.00, 200),
-(27, 2, 2, 'LG 27GP95R 4K电竞显示器', '27英寸 Nano IPS 160Hz', 5999.00, 160);
+(18, 2, 1, 'MacBook Pro 16 M4 Max', '48GB+1TB 深空黑', 34999.00, 120),
+(19, 2, 1, 'MacBook Air 15 M4', '16GB+512GB 午夜色', 12999.00, 350),
+(20, 2, 1, 'ThinkPad X1 Carbon 2025', 'Ultra 7 32GB 超薄商务', 12999.00, 210),
+(21, 2, 1, '戴尔 XPS 15 2025', 'Ultra 7 2.5K OLED屏', 11999.00, 180),
+(22, 2, 1, '华为 MateBook X Pro', 'Ultra 7 32GB 3.1K屏', 11999.00, 260),
+(23, 2, 1, '小米笔记本 Pro 16 2025', 'Ultra 7 32GB 3.1K屏', 7999.00, 320),
+(24, 2, 1, '华硕 ROG 幻16 Air', 'Ultra 9 RTX5070 2.5K', 15999.00, 150),
+(25, 2, 1, '联想拯救者 Y9000P 2025', 'i9 RTX5070Ti 2.5K 240Hz', 12999.00, 280),
+(26, 2, 1, '戴尔 U2723QE 4K显示器', '27英寸 IPS Black Type-C', 4999.00, 200),
+(27, 2, 1, 'LG 27GP95R 4K电竞显示器', '27英寸 Nano IPS 160Hz', 5999.00, 160);
 
 INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (29, 18, '内存:48GB,存储:1TB', 34999.00, 20),
@@ -94,7 +77,7 @@ INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (39, 26, '尺寸:27英寸,分辨率:4K', 4999.00, 35),
 (40, 27, '尺寸:27英寸,分辨率:4K', 5999.00, 25);
 
--- ==================== 家用电器（category_id=3）====================
+-- ==================== 家居日用-大家电（category_id=3）====================
 INSERT IGNORE INTO product (id, seller_id, category_id, title, subtitle, price, sales) VALUES
 (28, 2, 3, '格力 云佳 1.5匹变频空调', '新一级能效 静音运行', 3299.00, 850),
 (29, 2, 3, '美的 风尊 2匹变频空调', '新一级能效 智能控制', 5999.00, 420),
@@ -119,16 +102,16 @@ INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (49, 34, '型号:V15 Detect,颜色:金色', 4990.00, 35),
 (50, 35, '型号:X5 Pro,颜色:白色', 5999.00, 30);
 
--- ==================== 服装鞋包（category_id=4）====================
+-- ==================== 服饰鞋包-男装（category_id=2）====================
 INSERT IGNORE INTO product (id, seller_id, category_id, title, subtitle, price, sales) VALUES
-(38, 2, 4, '优衣库 男装 圆领T恤', '纯棉舒适 基础百搭', 79.00, 3200),
-(39, 2, 4, 'Nike Dri-FIT 速干运动T恤', '透气排汗 经典logo', 249.00, 1800),
-(40, 2, 4, 'Levi\'s 501 经典直筒牛仔裤', '美式经典 水洗蓝', 599.00, 950),
-(41, 2, 4, '优衣库 轻薄羽绒服', '90%白鸭绒 轻便保暖', 499.00, 2100),
-(42, 2, 4, 'ZARA 女装 缎面连衣裙', '优雅气质 通勤百搭', 399.00, 1200),
-(43, 2, 4, '波司登 极寒系列 长款羽绒服', '鹅绒充绒280g 抗寒-30℃', 2999.00, 680),
-(44, 2, 4, 'H&M 男装 连帽卫衣', '棉质混纺 休闲舒适', 199.00, 2500),
-(45, 2, 4, 'UNIQLO U 圆领卫衣', '厚实保暖 纯色简约', 299.00, 1900);
+(38, 2, 2, '优衣库 男装 圆领T恤', '纯棉舒适 基础百搭', 79.00, 3200),
+(39, 2, 2, 'Nike Dri-FIT 速干运动T恤', '透气排汗 经典logo', 249.00, 1800),
+(40, 2, 2, 'Levi\'s 501 经典直筒牛仔裤', '美式经典 水洗蓝', 599.00, 950),
+(41, 2, 2, '优衣库 轻薄羽绒服', '90%白鸭绒 轻便保暖', 499.00, 2100),
+(42, 2, 2, 'ZARA 女装 缎面连衣裙', '优雅气质 通勤百搭', 399.00, 1200),
+(43, 2, 2, '波司登 极寒系列 长款羽绒服', '鹅绒充绒280g 抗寒-30℃', 2999.00, 680),
+(44, 2, 2, 'H&M 男装 连帽卫衣', '棉质混纺 休闲舒适', 199.00, 2500),
+(45, 2, 2, 'UNIQLO U 圆领卫衣', '厚实保暖 纯色简约', 299.00, 1900);
 
 INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (51, 38, '颜色:白色,尺码:M', 79.00, 200),
@@ -145,16 +128,16 @@ INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (62, 44, '颜色:灰色,尺码:L', 199.00, 150),
 (63, 45, '颜色:黑色,尺码:L', 299.00, 130);
 
--- ==================== 食品饮料（category_id=5）====================
+-- ==================== 食品饮料-零食（category_id=4）====================
 INSERT IGNORE INTO product (id, seller_id, category_id, title, subtitle, price, sales) VALUES
-(46, 2, 5, '三顿半 超即溶咖啡 精选装', '冷萃工艺 24颗混合装', 189.00, 4500),
-(47, 2, 5, '农夫山泉 天然水 24瓶装', '550ml×24 长白山水源', 39.90, 8200),
-(48, 2, 5, '良品铺子 坚果大礼包', '每日坚果30袋 混合装', 128.00, 5600),
-(49, 2, 5, '伊利 金典纯牛奶 12盒装', '250ml×12 有机纯牛奶', 79.90, 7100),
-(50, 2, 5, '元气森林 气泡水 12瓶装', '0糖0脂0卡 白桃味', 59.90, 6300),
-(51, 2, 5, '瑞幸咖啡 耶加雪菲 500g', '中深烘焙 手冲精品', 89.00, 3200),
-(52, 2, 5, '百草味 肉干大礼包', '猪肉脯牛肉干混合装', 99.00, 4100),
-(53, 2, 5, '蒙牛 特仑苏 有机奶 10盒装', '250ml×10 有机纯牛奶', 89.90, 5800);
+(46, 2, 4, '三顿半 超即溶咖啡 精选装', '冷萃工艺 24颗混合装', 189.00, 4500),
+(47, 2, 4, '农夫山泉 天然水 24瓶装', '550ml×24 长白山水源', 39.90, 8200),
+(48, 2, 4, '良品铺子 坚果大礼包', '每日坚果30袋 混合装', 128.00, 5600),
+(49, 2, 4, '伊利 金典纯牛奶 12盒装', '250ml×12 有机纯牛奶', 79.90, 7100),
+(50, 2, 4, '元气森林 气泡水 12瓶装', '0糖0脂0卡 白桃味', 59.90, 6300),
+(51, 2, 4, '瑞幸咖啡 耶加雪菲 500g', '中深烘焙 手冲精品', 89.00, 3200),
+(52, 2, 4, '百草味 肉干大礼包', '猪肉脯牛肉干混合装', 99.00, 4100),
+(53, 2, 4, '蒙牛 特仑苏 有机奶 10盒装', '250ml×10 有机纯牛奶', 89.90, 5800);
 
 INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (64, 46, '规格:24颗混合装', 189.00, 200),
@@ -168,16 +151,16 @@ INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (72, 52, '规格:大礼包500g', 99.00, 250),
 (73, 53, '规格:10盒×250ml', 89.90, 350);
 
--- ==================== 美妆护肤（category_id=6）====================
+-- ==================== 美妆个护-面部护肤（category_id=5）====================
 INSERT IGNORE INTO product (id, seller_id, category_id, title, subtitle, price, sales) VALUES
-(54, 2, 6, '兰蔻 小黑瓶精华液 50ml', '肌底修护 维稳抗初老', 950.00, 3800),
-(55, 2, 6, '雅诗兰黛 小棕瓶精华 50ml', '修护肌肤 夜间修护', 850.00, 4200),
-(56, 2, 6, 'SK-II 神仙水 230ml', '平衡肌肤 改善肤质', 1190.00, 2900),
-(57, 2, 6, '资生堂 红腰子精华 75ml', '强韧肌肤 提升免疫力', 790.00, 3100),
-(58, 2, 6, '海蓝之谜 精华面霜 30ml', '修护肌肤 奢华滋养', 2680.00, 1200),
-(59, 2, 6, 'MAC 魅可 子弹头口红', '经典正红 显色持久', 170.00, 5600),
-(60, 2, 6, '迪奥 999 口红', '传奇红唇 经典款', 320.00, 480),
-(61, 2, 6, '完美日记 动物眼影盘', '12色大地色系 日常百搭', 129.00, 6200);
+(54, 2, 5, '兰蔻 小黑瓶精华液 50ml', '肌底修护 维稳抗初老', 950.00, 3800),
+(55, 2, 5, '雅诗兰黛 小棕瓶精华 50ml', '修护肌肤 夜间修护', 850.00, 4200),
+(56, 2, 5, 'SK-II 神仙水 230ml', '平衡肌肤 改善肤质', 1190.00, 2900),
+(57, 2, 5, '资生堂 红腰子精华 75ml', '强韧肌肤 提升免疫力', 790.00, 3100),
+(58, 2, 5, '海蓝之谜 精华面霜 30ml', '修护肌肤 奢华滋养', 2680.00, 1200),
+(59, 2, 5, 'MAC 魅可 子弹头口红', '经典正红 显色持久', 170.00, 5600),
+(60, 2, 5, '迪奥 999 口红', '传奇红唇 经典款', 320.00, 480),
+(61, 2, 5, '完美日记 动物眼影盘', '12色大地色系 日常百搭', 129.00, 6200);
 
 INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (74, 54, '容量:50ml,类型:精华液', 950.00, 100),
@@ -191,16 +174,16 @@ INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (82, 60, '色号:999,类型:缎光', 320.00, 150),
 (83, 61, '色号:01大地色,类型:哑光', 129.00, 250);
 
--- ==================== 家居日用（category_id=7）====================
+-- ==================== 家居日用-床上用品（category_id=3）====================
 INSERT IGNORE INTO product (id, seller_id, category_id, title, subtitle, price, sales) VALUES
-(62, 2, 7, '全棉时代 纯棉四件套', '100%全棉 裸睡级舒适', 599.00, 2800),
-(63, 2, 7, '水星家纺 乳胶枕头', '泰国天然乳胶 护颈助眠', 299.00, 3500),
-(64, 2, 7, '苏泊尔 电饭煲 4L', '球釜IH 多功能预约', 399.00, 4200),
-(65, 2, 7, '摩飞 多功能料理锅', '煎烤蒸煮 一锅搞定', 399.00, 3100),
-(66, 2, 7, '北鼎 即热饮水机', '3秒即热 6段温控', 799.00, 2400),
-(67, 2, 7, '追觅 吸尘器 V16', '185AW大吸力 无线手持', 2999.00, 1800),
-(68, 2, 7, '洁丽雅 毛巾套装', '纯棉加厚 3条装', 69.00, 8500),
-(69, 2, 7, '乐扣乐扣 保鲜盒套装', '耐热玻璃 5件套', 149.00, 5200);
+(62, 2, 3, '全棉时代 纯棉四件套', '100%全棉 裸睡级舒适', 599.00, 2800),
+(63, 2, 3, '水星家纺 乳胶枕头', '泰国天然乳胶 护颈助眠', 299.00, 3500),
+(64, 2, 3, '苏泊尔 电饭煲 4L', '球釜IH 多功能预约', 399.00, 4200),
+(65, 2, 3, '摩飞 多功能料理锅', '煎烤蒸煮 一锅搞定', 399.00, 3100),
+(66, 2, 3, '北鼎 即热饮水机', '3秒即热 6段温控', 799.00, 2400),
+(67, 2, 3, '追觅 吸尘器 V16', '185AW大吸力 无线手持', 2999.00, 1800),
+(68, 2, 3, '洁丽雅 毛巾套装', '纯棉加厚 3条装', 69.00, 8500),
+(69, 2, 3, '乐扣乐扣 保鲜盒套装', '耐热玻璃 5件套', 149.00, 5200);
 
 INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (84, 62, '尺寸:1.5m床,颜色:白色', 599.00, 100),
@@ -213,16 +196,16 @@ INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (91, 68, '规格:3条装,颜色:混合色', 69.00, 300),
 (92, 69, '规格:5件套,颜色:透明', 149.00, 200);
 
--- ==================== 运动户外（category_id=8）====================
+-- ==================== 运动户外-运动鞋服（category_id=6）====================
 INSERT IGNORE INTO product (id, seller_id, category_id, title, subtitle, price, sales) VALUES
-(70, 2, 8, 'Nike Air Max 270 跑鞋', '气垫缓震 经典百搭', 899.00, 2800),
-(71, 2, 8, 'Adidas Ultraboost Light', 'BOOST缓震 轻量回弹', 1099.00, 2200),
-(72, 2, 8, '迪卡侬 双肩背包 30L', '防水面料 户外徒步', 149.00, 4500),
-(73, 2, 8, 'Keep 智能动感单车', '磁控静音 AI私教', 2999.00, 1200),
-(74, 2, 8, '李宁 飞电3 Challenger', '碳板跑鞋 竞速训练', 599.00, 3200),
-(75, 2, 8, '安踏 C202 GT 马拉松跑鞋', '氮科技 碳板竞速', 899.00, 2100),
-(76, 2, 8, 'Yonex 天斧88D 羽毛球拍', '进攻型 高磅数', 1280.00, 1500),
-(77, 2, 8, '迪卡侬 冲锋衣', '防水透湿 三合一', 499.00, 3800);
+(70, 2, 6, 'Nike Air Max 270 跑鞋', '气垫缓震 经典百搭', 899.00, 2800),
+(71, 2, 6, 'Adidas Ultraboost Light', 'BOOST缓震 轻量回弹', 1099.00, 2200),
+(72, 2, 6, '迪卡侬 双肩背包 30L', '防水面料 户外徒步', 149.00, 4500),
+(73, 2, 6, 'Keep 智能动感单车', '磁控静音 AI私教', 2999.00, 1200),
+(74, 2, 6, '李宁 飞电3 Challenger', '碳板跑鞋 竞速训练', 599.00, 3200),
+(75, 2, 6, '安踏 C202 GT 马拉松跑鞋', '氮科技 碳板竞速', 899.00, 2100),
+(76, 2, 6, 'Yonex 天斧88D 羽毛球拍', '进攻型 高磅数', 1280.00, 1500),
+(77, 2, 6, '迪卡侬 冲锋衣', '防水透湿 三合一', 499.00, 3800);
 
 INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (93, 70, '颜色:黑白,尺码:42', 899.00, 80),
@@ -235,14 +218,14 @@ INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (100, 76, '颜色:黑金,重量:4U', 1280.00, 40),
 (101, 77, '颜色:黑色,尺码:L', 499.00, 150);
 
--- ==================== 母婴玩具（category_id=9）====================
+-- ==================== 母婴玩具-婴儿用品（category_id=7）====================
 INSERT IGNORE INTO product (id, seller_id, category_id, title, subtitle, price, sales) VALUES
-(78, 2, 9, '乐高 城市系列 消防站', '培养动手能力 6岁+', 399.00, 3200),
-(79, 2, 9, '费雪 学步车', '多功能 可坐可推', 299.00, 2800),
-(80, 2, 9, '飞鹤 星飞帆 3段奶粉', '900g 新国标 适合12-36月', 299.00, 5200),
-(81, 2, 9, '巴拉巴拉 童装套装', '纯棉舒适 男女童通用', 129.00, 4100),
-(82, 2, 9, 'babycare 婴儿湿巾', '80抽×6包 加厚绵柔', 59.00, 8200),
-(83, 2, 9, '帮宝适 一级帮纸尿裤', 'NB码96片 新生儿专用', 189.00, 6100);
+(78, 2, 7, '乐高 城市系列 消防站', '培养动手能力 6岁+', 399.00, 3200),
+(79, 2, 7, '费雪 学步车', '多功能 可坐可推', 299.00, 2800),
+(80, 2, 7, '飞鹤 星飞帆 3段奶粉', '900g 新国标 适合12-36月', 299.00, 5200),
+(81, 2, 7, '巴拉巴拉 童装套装', '纯棉舒适 男女童通用', 129.00, 4100),
+(82, 2, 7, 'babycare 婴儿湿巾', '80抽×6包 加厚绵柔', 59.00, 8200),
+(83, 2, 7, '帮宝适 一级帮纸尿裤', 'NB码96片 新生儿专用', 189.00, 6100);
 
 INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (102, 78, '系列:城市系列,型号:消防站', 399.00, 80),
@@ -252,31 +235,14 @@ INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (106, 82, '规格:80抽×6包', 59.00, 300),
 (107, 83, '规格:NB码96片', 189.00, 250);
 
--- ==================== 图书文具（category_id=10）====================
+-- ==================== 服饰鞋包-鞋靴箱包（category_id=2）====================
 INSERT IGNORE INTO product (id, seller_id, category_id, title, subtitle, price, sales) VALUES
-(84, 2, 10, '三体 全三册', '刘慈欣 科幻巨著', 93.00, 12000),
-(85, 2, 10, '百年孤独', '加西亚·马尔克斯 经典文学', 55.00, 8500),
-(86, 2, 10, '斑马 中性笔 0.5mm', '12支装 黑色 大容量', 29.90, 15000),
-(87, 2, 10, '晨光 文具套装', '开学必备 大礼包', 89.00, 9200),
-(88, 2, 10, '得力 打印纸 A4', '500张/包 70g 双面打印', 29.90, 18000),
-(89, 2, 10, 'Kindle Paperwhite 5', '6.8英寸 32GB 防水', 1068.00, 3200);
-
-INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
-(108, 84, '套装:全三册,装帧:平装', 93.00, 500),
-(109, 85, '装帧:精装,版本:50周年纪念版', 55.00, 400),
-(110, 86, '颜色:黑色,数量:12支', 29.90, 800),
-(111, 87, '型号:开学大礼包', 89.00, 300),
-(112, 88, '规格:A4 500张', 29.90, 1000),
-(113, 89, '颜色:黑色,存储:32GB', 1068.00, 60);
-
--- ==================== 鞋靴箱包（category_id=11）====================
-INSERT IGNORE INTO product (id, seller_id, category_id, title, subtitle, price, sales) VALUES
-(90, 2, 11, '新百伦 574 经典跑鞋', '复古百搭 舒适缓震', 699.00, 3500),
-(91, 2, 11, '匡威 Chuck 70 高帮', '经典帆布鞋 复古潮', 599.00, 4200),
-(92, 2, 11, 'Nike Dunk Low 熊猫', '经典配色 百搭板鞋', 799.00, 5100),
-(93, 2, 11, 'Coach 蔻驰 单肩包', '经典C字logo 真皮', 2999.00, 1800),
-(94, 2, 11, '新秀丽 行李箱 20寸', 'PC材质 万向轮 登机箱', 899.00, 2800),
-(95, 2, 11, '万里马 男士手提包', '头层牛皮 商务公文包', 399.00, 2200);
+(90, 2, 2, '新百伦 574 经典跑鞋', '复古百搭 舒适缓震', 699.00, 3500),
+(91, 2, 2, '匡威 Chuck 70 高帮', '经典帆布鞋 复古潮', 599.00, 4200),
+(92, 2, 2, 'Nike Dunk Low 熊猫', '经典配色 百搭板鞋', 799.00, 5100),
+(93, 2, 2, 'Coach 蔻驰 单肩包', '经典C字logo 真皮', 2999.00, 1800),
+(94, 2, 2, '新秀丽 行李箱 20寸', 'PC材质 万向轮 登机箱', 899.00, 2800),
+(95, 2, 2, '万里马 男士手提包', '头层牛皮 商务公文包', 399.00, 2200);
 
 INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (114, 90, '颜色:灰蓝,尺码:42', 699.00, 80),
@@ -287,3 +253,11 @@ INSERT IGNORE INTO sku (id, product_id, specs, price, stock) VALUES
 (119, 93, '颜色:棕色,尺寸:中号', 2999.00, 30),
 (120, 94, '颜色:黑色,尺寸:20寸', 899.00, 60),
 (121, 95, '颜色:黑色,尺寸:标准', 399.00, 50);
+
+-- ==================== 优惠券种子数据 ====================
+INSERT IGNORE INTO coupon_template (id, name, discount, min_amount, total, remain, start_date, end_date, status) VALUES
+(1, '新人专享券', 20.00, 100.00, 500, 500, '2026-01-01', '2026-12-31', 1),
+(2, '满500减50', 50.00, 500.00, 200, 200, '2026-01-01', '2026-12-31', 1),
+(3, '满1000减100', 100.00, 1000.00, 100, 100, '2026-01-01', '2026-12-31', 1),
+(4, '数码专享券', 200.00, 3000.00, 50, 50, '2026-01-01', '2026-12-31', 1),
+(5, '美妆专享券', 30.00, 200.00, 300, 300, '2026-01-01', '2026-12-31', 1);

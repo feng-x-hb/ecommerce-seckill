@@ -5,11 +5,13 @@ import com.example.mall.dto.LoginDTO;
 import com.example.mall.dto.LoginVO;
 import com.example.mall.dto.RegisterDTO;
 import com.example.mall.dto.ResetPasswordDTO;
+import com.example.mall.dto.ProfileDTO;
 import com.example.mall.service.AuthService;
 import com.example.mall.vo.UserInfoVO;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,6 +80,17 @@ public class AuthController {
     @PostMapping("/reset-password")
     public Result<Void> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
         authService.resetPassword(resetPasswordDTO);
+        return Result.success(null);
+    }
+
+    /**
+     * 更新个人资料：PUT /api/auth/profile
+     * 需要登录，可更新昵称、头像、个性签名。
+     */
+    @PutMapping("/profile")
+    public Result<Void> updateProfile(@RequestAttribute("userId") Long userId,
+                                      @RequestBody ProfileDTO profileDTO) {
+        authService.updateProfile(userId, profileDTO);
         return Result.success(null);
     }
 }

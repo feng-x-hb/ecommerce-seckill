@@ -4,6 +4,7 @@ import com.example.mall.dto.RegisterDTO;
 import com.example.mall.dto.LoginDTO;
 import com.example.mall.dto.LoginVO;
 import com.example.mall.dto.ResetPasswordDTO;
+import com.example.mall.dto.ProfileDTO;
 import com.example.mall.vo.UserInfoVO;
 
 /**
@@ -45,4 +46,12 @@ public interface AuthService {
      * @param resetPasswordDTO 重置参数（username 或 phone + newPassword）
      */
     void resetPassword(ResetPasswordDTO resetPasswordDTO);
+
+    /**
+     * 更新当前用户个人资料
+     *
+     * @param userId 当前用户 id
+     * @param profileDTO 更新字段（昵称/头像/签名）
+     */
+    void updateProfile(Long userId, ProfileDTO profileDTO);
 }

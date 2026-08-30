@@ -1,16 +1,17 @@
 <script setup lang="ts">
 /**
- * 首页 - 华丽版
- * 大轮播图 + 分类导航 + 限时秒杀预告 + 为你推荐 + 热卖排行
+ * 首页 - 华丽版 v2
+ * 通知条 + 轮播图(毛玻璃) + 分类导航 + 限时秒杀 + 为你推荐 + 热卖排行
  */
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getProductList } from '@/api/product'
 import request from '@/api/request'
 import type { Product, Category } from '@/types'
 import ProductCard from '@/components/ProductCard.vue'
 
 const route = useRoute()
+const router = useRouter()
 
 const products = ref<Product[]>([])
 const categories = ref<Category[]>([])
@@ -51,7 +52,6 @@ function updateCountdown() {
   }
 }
 
-// 为你推荐数据（模拟）
 const recommendedProducts = ref<Product[]>([])
 const hotProducts = ref<Product[]>([])
 
@@ -75,15 +75,19 @@ async function fetchProducts() {
 async function fetchCategories() {
   try {
     const res: any = await request.get('/category/list')
-    categories.value = res.data.filter((c: Category) => c.status === 1)
+    categories.value = res.data.filter((c: Category) => c.status === 0)
   } catch { /* ignore */ }
 }
 
 function selectCategory(catId: number | undefined) {
-  activeCategoryId.value = catId
-  keyword.value = ''
-  page.value = 1
-  fetchProducts()
+  if (catId) {
+    router.push(`/category/${catId}`)
+  } else {
+    activeCategoryId.value = undefined
+    keyword.value = ''
+    page.value = 1
+    fetchProducts()
+  }
 }
 
 onMounted(() => {
@@ -102,6 +106,27 @@ onUnmounted(() => {
 
 <template>
   <div class="home-page">
+    <!-- ========== 背景飘浮粒子 ========== -->
+    <div class="bg-particles">
+      <span class="particle" v-for="i in 15" :key="i" :style="{
+        left: (i * 7) % 100 + '%',
+        animationDelay: (i * 0.7) + 's',
+        animationDuration: (8 + i % 5 * 2) + 's',
+        fontSize: (8 + i % 4 * 4) + 'px',
+        opacity: 0.1 + (i % 3) * 0.05
+      }">{{ ['✦','◆','●','★','♦'][i % 5] }}</span>
+    </div>
+
+    <!-- ========== 顶部通知条 ========== -->
+    <div class="notice-bar">
+      <div class="notice-inner container">
+        <span class="notice-tag">📢 公告</span>
+        <div class="notice-scroll">
+          <span class="notice-text">新用户注册立减5元 | 全场满99包邮 | 每日10点秒杀上新</span>
+        </div>
+      </div>
+    </div>
+
     <!-- ========== 顶部轮播区 ========== -->
     <div class="hero-section container">
       <!-- 左侧分类 -->
@@ -110,26 +135,27 @@ onUnmounted(() => {
           <el-icon><Grid /></el-icon> 全部商品分类
         </div>
         <div
-          v-for="cat in categories"
+          v-for="(cat, idx) in categories"
           :key="cat.id"
           class="cat-item"
           :class="{ active: activeCategoryId === cat.id }"
           @click="selectCategory(cat.id)"
         >
-          <span class="cat-icon">📦</span>
-          {{ cat.name }}
+          <span class="cat-icon">{{ ['📱','👔','🏠','🍜','💄','⚽','🍼'][idx % 7] }}</span>
+          <span class="cat-name">{{ cat.name }}</span>
           <el-icon class="cat-arrow"><ArrowRight /></el-icon>
         </div>
         <div class="cat-item" :class="{ active: !activeCategoryId }" @click="selectCategory(undefined)">
-          <span class="cat-icon">🏷️</span> 全部
+          <span class="cat-icon">🏷️</span>
+          <span class="cat-name">全部</span>
         </div>
       </div>
 
       <!-- 右侧轮播 -->
       <div class="banner-wrapper">
         <div class="banner-slide" :style="{ background: banners[bannerIndex].gradient }">
-          <div class="banner-content animate-fade-in">
-            <div class="banner-tag tag tag-red">{{ banners[bannerIndex].tag }}</div>
+          <div class="banner-content animate-fade-in" :key="bannerIndex">
+            <div class="banner-tag">{{ banners[bannerIndex].tag }}</div>
             <div class="banner-icon">{{ banners[bannerIndex].icon }}</div>
             <h2 class="banner-title">{{ banners[bannerIndex].title }}</h2>
             <p class="banner-sub">{{ banners[bannerIndex].sub }}</p>
@@ -137,10 +163,11 @@ onUnmounted(() => {
               立即查看 <el-icon><ArrowRight /></el-icon>
             </button>
           </div>
-          <!-- 装饰圆 -->
+          <!-- 装饰 -->
           <div class="deco-circle deco-1"></div>
           <div class="deco-circle deco-2"></div>
           <div class="deco-circle deco-3"></div>
+          <div class="deco-ring deco-4"></div>
           <!-- 轮播指示器 -->
           <div class="banner-dots">
             <span v-for="(_, i) in banners" :key="i" class="dot" :class="{ active: i === bannerIndex }" @click="bannerIndex = i" />
@@ -151,24 +178,31 @@ onUnmounted(() => {
       <!-- 右侧信息卡 -->
       <div class="side-cards">
         <div class="side-card gradient-animated">
-          <el-icon :size="24"><Timer /></el-icon>
+          <div class="side-icon-wrap"><el-icon :size="24"><Timer /></el-icon></div>
           <div>
             <div class="side-card-title">限时秒杀</div>
             <div class="side-card-desc">每日上新</div>
           </div>
         </div>
         <div class="side-card" style="background:linear-gradient(135deg,#2baa6e,#34d058)">
-          <el-icon :size="24"><CircleCheck /></el-icon>
+          <div class="side-icon-wrap"><el-icon :size="24"><CircleCheck /></el-icon></div>
           <div>
             <div class="side-card-title">品质保证</div>
             <div class="side-card-desc">正品行货</div>
           </div>
         </div>
         <div class="side-card" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">
-          <el-icon :size="24"><Van /></el-icon>
+          <div class="side-icon-wrap"><el-icon :size="24"><Van /></el-icon></div>
           <div>
             <div class="side-card-title">极速发货</div>
             <div class="side-card-desc">次日达</div>
+          </div>
+        </div>
+        <div class="side-card" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)">
+          <div class="side-icon-wrap"><el-icon :size="24"><Service /></el-icon></div>
+          <div>
+            <div class="side-card-title">售后服务</div>
+            <div class="side-card-desc">7天退换</div>
           </div>
         </div>
       </div>
@@ -178,7 +212,7 @@ onUnmounted(() => {
     <div class="section container">
       <div class="seckill-banner card">
         <div class="seckill-left">
-          <span class="flash-icon animate-pulse">⚡</span>
+          <div class="flash-badge animate-pulse">⚡</div>
           <div>
             <h3 class="seckill-title">限时秒杀</h3>
             <p class="seckill-sub">每日精选 限时限量</p>
@@ -204,8 +238,9 @@ onUnmounted(() => {
     <div class="section container" v-if="recommendedProducts.length">
       <div class="section-header">
         <div class="section-title-group">
-          <el-icon :size="24" color="#e1251b"><Star /></el-icon>
+          <span class="title-icon-box" style="background:linear-gradient(135deg,#e1251b,#ff6700)"><el-icon :size="18" color="#fff"><Star /></el-icon></span>
           <h2 class="section-title">为你推荐</h2>
+          <span class="title-line"></span>
         </div>
         <div class="section-desc">根据你的浏览推荐</div>
       </div>
@@ -229,17 +264,19 @@ onUnmounted(() => {
     <div class="section container" v-if="hotProducts.length">
       <div class="section-header">
         <div class="section-title-group">
-          <el-icon :size="24" color="#ff6700"><TrendCharts /></el-icon>
+          <span class="title-icon-box" style="background:linear-gradient(135deg,#ff6700,#f5a623)"><el-icon :size="18" color="#fff"><TrendCharts /></el-icon></span>
           <h2 class="section-title">热卖排行</h2>
+          <span class="title-line"></span>
         </div>
         <div class="section-desc">大家都在买</div>
       </div>
       <div class="hot-grid">
-        <div v-for="(p, i) in hotProducts" :key="p.id" class="hot-card card hover-lift" :style="{ animationDelay: i * 0.15 + 's' }" class2="animate-fade-in-up">
+        <div v-for="(p, i) in hotProducts" :key="p.id" class="hot-card card hover-lift" :style="{ animationDelay: i * 0.15 + 's' }">
           <div class="hot-rank" :class="'rank-' + (i+1)">{{ i + 1 }}</div>
           <router-link :to="`/product/${p.id}`">
             <div class="hot-image" :style="{ background: `hsl(${p.id * 47 % 360}, 60%, 85%)` }">
-              <span>{{ p.title.charAt(0) }}</span>
+              <img v-if="p.mainImage" :src="p.mainImage" :alt="p.title" class="hot-img" @error="($event.target as HTMLImageElement).style.display='none'" />
+              <span v-if="!p.mainImage">{{ p.title.charAt(0) }}</span>
             </div>
             <div class="hot-info">
               <div class="hot-name ellipsis">{{ p.title }}</div>
@@ -254,8 +291,9 @@ onUnmounted(() => {
     <div class="section container">
       <div class="section-header">
         <div class="section-title-group">
-          <el-icon :size="24" color="#333"><Grid /></el-icon>
+          <span class="title-icon-box" style="background:linear-gradient(135deg,#333,#666)"><el-icon :size="18" color="#fff"><Grid /></el-icon></span>
           <h2 class="section-title">全部商品</h2>
+          <span class="title-line"></span>
         </div>
         <div class="section-tags">
           <span
@@ -303,16 +341,83 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.home-page { padding-bottom: 40px; }
+.home-page { padding-bottom: 40px; position: relative; overflow: hidden; }
+
+/* ========== 背景粒子 ========== */
+.bg-particles {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.particle {
+  position: absolute;
+  top: -20px;
+  color: #e1251b;
+  animation: particleFall linear infinite;
+}
+@keyframes particleFall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.15; }
+  90% { opacity: 0.15; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+/* ========== 通知条 ========== */
+.notice-bar {
+  background: linear-gradient(90deg, #fff8f0, #fff5f5, #fff8f0);
+  border-bottom: 1px solid #ffe8e8;
+  overflow: hidden;
+}
+.notice-inner {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  gap: 12px;
+}
+.notice-tag {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #e1251b, #ff6700);
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.notice-scroll { overflow: hidden; flex: 1; }
+.notice-text {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scrollNotice 20s linear infinite;
+  font-size: 13px;
+  color: #666;
+}
+@keyframes scrollNotice {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
 
 /* ========== 轮播区 ========== */
 .hero-section {
   display: flex;
   gap: 0;
-  margin: 20px auto;
+  margin: 16px auto;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+  box-shadow: 0 12px 48px rgba(0,0,0,0.12);
+  position: relative;
+  z-index: 1;
+}
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(225,37,27,0.05), transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,103,0,0.05), transparent 50%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .category-sidebar {
@@ -328,7 +433,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .cat-item {
   padding: 10px 16px;
@@ -339,15 +445,19 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+  border-left: 3px solid transparent;
 }
 .cat-item:hover, .cat-item.active {
-  background: var(--jd-red);
+  background: linear-gradient(90deg, rgba(225,37,27,0.2), transparent);
   color: #fff;
-  padding-left: 22px;
+  padding-left: 20px;
+  border-left-color: #e1251b;
+  text-shadow: 0 0 8px rgba(255,255,255,0.3);
 }
-.cat-icon { font-size: 14px; }
-.cat-arrow { margin-left: auto; opacity: 0; transition: opacity 0.3s; }
-.cat-item:hover .cat-arrow { opacity: 1; }
+.cat-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
+.cat-name { flex: 1; }
+.cat-arrow { opacity: 0; transition: all 0.3s; transform: translateX(-4px); }
+.cat-item:hover .cat-arrow { opacity: 1; transform: translateX(0); }
 
 .banner-wrapper { flex: 1; position: relative; }
 .banner-slide {
@@ -365,16 +475,17 @@ onUnmounted(() => {
 }
 .banner-tag {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 4px;
+  padding: 4px 14px;
+  border-radius: 20px;
   font-size: 12px;
   margin-bottom: 12px;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(4px);
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.3);
 }
-.banner-icon { font-size: 48px; margin-bottom: 12px; }
-.banner-title { font-size: 36px; font-weight: bold; margin-bottom: 8px; text-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-.banner-sub { font-size: 16px; opacity: 0.9; margin-bottom: 20px; }
+.banner-icon { font-size: 52px; margin-bottom: 12px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+.banner-title { font-size: 38px; font-weight: bold; margin-bottom: 8px; text-shadow: 0 3px 12px rgba(0,0,0,0.25); }
+.banner-sub { font-size: 16px; opacity: 0.9; margin-bottom: 20px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
 .banner-btn {
   padding: 10px 28px;
   background: rgba(255,255,255,0.2);
@@ -387,18 +498,26 @@ onUnmounted(() => {
   align-items: center;
   gap: 6px;
   transition: all 0.3s;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
 }
-.banner-btn:hover { background: #fff; color: #333; }
+.banner-btn:hover { background: #fff; color: #333; transform: translateX(4px); }
 
 .deco-circle {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
+}
+.deco-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.1);
+  background: transparent;
 }
 .deco-1 { width: 200px; height: 200px; top: -50px; right: 100px; animation: float 6s ease-in-out infinite; }
 .deco-2 { width: 120px; height: 120px; bottom: -30px; right: 200px; animation: float 4s ease-in-out infinite 1s; }
 .deco-3 { width: 80px; height: 80px; top: 50px; right: 50px; animation: float 5s ease-in-out infinite 0.5s; }
+.deco-4 { width: 160px; height: 160px; top: 20px; right: 150px; animation: spin 20s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 .banner-dots {
   position: absolute;
@@ -416,7 +535,7 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all 0.3s;
 }
-.dot.active { background: #fff; width: 28px; border-radius: 5px; }
+.dot.active { background: #fff; width: 28px; border-radius: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
 .side-cards {
   width: 190px;
@@ -434,9 +553,21 @@ onUnmounted(() => {
   color: #fff;
   font-size: 13px;
   cursor: pointer;
-  transition: filter 0.3s;
+  transition: all 0.3s;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-.side-card:hover { filter: brightness(1.1); }
+.side-card:last-child { border-bottom: none; }
+.side-card:hover { filter: brightness(1.1); transform: scale(1.02); }
+.side-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 .side-card-title { font-weight: bold; }
 .side-card-desc { font-size: 11px; opacity: 0.8; }
 
@@ -449,20 +580,41 @@ onUnmounted(() => {
   margin-top: 20px;
   background: linear-gradient(135deg, #fff5f5, #fff0f0);
   border: 1px solid #ffe0e0;
+  border-left: 4px solid #e1251b;
+  position: relative;
+  overflow: hidden;
+}
+.seckill-banner::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 200px;
+  background: linear-gradient(90deg, transparent, rgba(225,37,27,0.03));
+  pointer-events: none;
 }
 .seckill-left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-.flash-icon { font-size: 32px; }
+.flash-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e1251b, #ff6700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 16px rgba(225,37,27,0.3);
+}
 .seckill-title { font-size: 20px; color: var(--jd-red); font-weight: bold; }
 .seckill-sub { font-size: 13px; color: #999; }
 .countdown-box { text-align: center; }
 .countdown-label { font-size: 12px; color: #999; display: block; margin-bottom: 4px; }
 .countdown-nums { display: flex; align-items: center; gap: 4px; }
 .num-block {
-  background: #333;
+  background: linear-gradient(135deg, #333, #555);
   color: #fff;
   padding: 6px 10px;
   border-radius: 6px;
@@ -470,6 +622,7 @@ onUnmounted(() => {
   font-weight: bold;
   min-width: 40px;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 .num-sep { font-size: 18px; font-weight: bold; color: var(--jd-red); }
 .seckill-more {
@@ -479,7 +632,9 @@ onUnmounted(() => {
   color: var(--jd-red);
   font-size: 14px;
   font-weight: bold;
+  transition: transform 0.3s;
 }
+.seckill-more:hover { transform: translateX(4px); }
 
 /* ========== Section ========== */
 .section { margin-top: 30px; }
@@ -494,10 +649,25 @@ onUnmounted(() => {
   align-items: center;
   gap: 10px;
 }
+.title-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 .section-title { font-size: 22px; font-weight: bold; }
+.title-line {
+  width: 40px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #e1251b, transparent);
+}
 .section-desc { font-size: 13px; color: #999; }
 
-.section-tags { display: flex; gap: 8px; }
+.section-tags { display: flex; gap: 8px; flex-wrap: wrap; }
 .filter-tag {
   padding: 6px 16px;
   border-radius: 20px;
@@ -544,9 +714,9 @@ onUnmounted(() => {
   font-weight: bold;
   z-index: 1;
 }
-.rank-1 { background: var(--jd-red); }
-.rank-2 { background: var(--jd-orange); }
-.rank-3 { background: var(--jd-gold); }
+.rank-1 { background: linear-gradient(135deg, #e1251b, #ff4e3a); box-shadow: 0 2px 8px rgba(225,37,27,0.4); }
+.rank-2 { background: linear-gradient(135deg, #ff6700, #ff9500); }
+.rank-3 { background: linear-gradient(135deg, #f5a623, #f7c948); }
 
 .hot-image {
   width: 100%;
@@ -554,7 +724,16 @@ onUnmounted(() => {
   border-radius: 8px;
   position: relative;
   margin-bottom: 10px;
+  overflow: hidden;
 }
+.hot-img {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 2;
+  transition: transform 0.4s;
+}
+.hot-card:hover .hot-img { transform: scale(1.08); }
 .hot-image span {
   position: absolute;
   top: 50%;

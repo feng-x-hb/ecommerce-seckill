@@ -38,8 +38,9 @@ public class OrderController {
         String receiverName = (String) body.get("receiverName");
         String receiverPhone = (String) body.get("receiverPhone");
         String receiverAddress = (String) body.get("receiverAddress");
+        Long couponId = body.get("couponId") != null ? Long.valueOf(body.get("couponId").toString()) : null;
 
-        String orderNo = orderService.createOrder(userId, skuItems, receiverName, receiverPhone, receiverAddress);
+        String orderNo = orderService.createOrder(userId, skuItems, receiverName, receiverPhone, receiverAddress, couponId);
         return Result.success(Map.of("orderNo", orderNo));
     }
 

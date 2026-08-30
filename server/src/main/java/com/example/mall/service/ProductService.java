@@ -3,6 +3,7 @@ package com.example.mall.service;
 import com.example.mall.vo.ProductDetailVO;
 import com.example.mall.vo.ProductVO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,4 +29,9 @@ public interface ProductService {
      * @return 商品详情（含规格列表）
      */
     ProductDetailVO detail(Long id);
+
+    /**
+     * 搜索补全：返回匹配的商品标题（最多10条）
+     */
+    List<String> suggest(String keyword);
 }

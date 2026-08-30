@@ -6,6 +6,7 @@ import com.example.mall.dto.RegisterDTO;
 import com.example.mall.dto.LoginDTO;
 import com.example.mall.dto.LoginVO;
 import com.example.mall.dto.ResetPasswordDTO;
+import com.example.mall.dto.ProfileDTO;
 import com.example.mall.entity.User;
 import com.example.mall.mapper.UserMapper;
 import com.example.mall.service.AuthService;
@@ -148,6 +149,8 @@ public class AuthServiceImpl implements AuthService {
         vo.setUsername(user.getUsername());
         vo.setNickname(user.getNickname());
         vo.setAvatar(user.getAvatar());
+        vo.setSignature(user.getSignature());
+        vo.setPhone(user.getPhone());
         vo.setRole(user.getRole());
         return vo;
     }
@@ -180,6 +183,25 @@ public class AuthServiceImpl implements AuthService {
 
         // 更新密码（BCrypt 加密）
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userMapper.updateById(user);
+    }
+
+    @Override
+    @Transactional
+    public void updateProfile(Long userId, ProfileDTO profileDTO) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        if (profileDTO.getNickname() != null && !profileDTO.getNickname().isBlank()) {
+            user.setNickname(profileDTO.getNickname());
+        }
+        if (profileDTO.getAvatar() != null) {
+            user.setAvatar(profileDTO.getAvatar());
+        }
+        if (profileDTO.getSignature() != null) {
+            user.setSignature(profileDTO.getSignature());
+        }
         userMapper.updateById(user);
     }
 }

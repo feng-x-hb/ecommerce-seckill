@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS user (
     phone      VARCHAR(11)  DEFAULT NULL,
     nickname   VARCHAR(50)  DEFAULT NULL,
     avatar     VARCHAR(255) DEFAULT NULL,
+    signature  VARCHAR(200) DEFAULT NULL,
     role       TINYINT      NOT NULL DEFAULT 0,
     status     TINYINT      NOT NULL DEFAULT 0,
     created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -32,35 +33,52 @@ CREATE TABLE IF NOT EXISTS category (
     INDEX idx_name (name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ==================== 分类种子数据 ====================
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '手机数码', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='手机数码' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '电脑办公', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='电脑办公' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '家用电器', 2, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='家用电器' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '服装鞋包', 3, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='服装鞋包' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '食品饮料', 4, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='食品饮料' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '美妆护肤', 5, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='美妆护肤' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '家居日用', 6, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='家居日用' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '运动户外', 7, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='运动户外' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '母婴玩具', 8, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='母婴玩具' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '图书文具', 9, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='图书文具' AND parent_id=0);
-INSERT INTO category (parent_id, name, sort, status) SELECT 0, '鞋靴箱包', 10, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='鞋靴箱包' AND parent_id=0);
+-- ==================== 分类种子数据（7大类 + 子分类） ====================
+-- 顶级分类
+INSERT INTO category (parent_id, name, sort, status) SELECT 0, '数码家电', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='数码家电' AND parent_id=0);
+INSERT INTO category (parent_id, name, sort, status) SELECT 0, '服饰鞋包', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='服饰鞋包' AND parent_id=0);
+INSERT INTO category (parent_id, name, sort, status) SELECT 0, '家居日用', 2, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='家居日用' AND parent_id=0);
+INSERT INTO category (parent_id, name, sort, status) SELECT 0, '食品饮料', 3, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='食品饮料' AND parent_id=0);
+INSERT INTO category (parent_id, name, sort, status) SELECT 0, '美妆个护', 4, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='美妆个护' AND parent_id=0);
+INSERT INTO category (parent_id, name, sort, status) SELECT 0, '运动户外', 5, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='运动户外' AND parent_id=0);
+INSERT INTO category (parent_id, name, sort, status) SELECT 0, '母婴玩具', 6, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='母婴玩具' AND parent_id=0);
 
--- 子分类
+-- 数码家电 子分类
 INSERT INTO category (parent_id, name, sort, status) SELECT 1, '智能手机', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='智能手机' AND parent_id=1);
 INSERT INTO category (parent_id, name, sort, status) SELECT 1, '平板电脑', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='平板电脑' AND parent_id=1);
-INSERT INTO category (parent_id, name, sort, status) SELECT 1, '手机配件', 2, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='手机配件' AND parent_id=1);
-INSERT INTO category (parent_id, name, sort, status) SELECT 2, '笔记本电脑', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='笔记本电脑' AND parent_id=2);
-INSERT INTO category (parent_id, name, sort, status) SELECT 2, '台式机', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='台式机' AND parent_id=2);
-INSERT INTO category (parent_id, name, sort, status) SELECT 2, '显示器', 2, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='显示器' AND parent_id=2);
-INSERT INTO category (parent_id, name, sort, status) SELECT 3, '空调', 3, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='空调' AND parent_id=3);
-INSERT INTO category (parent_id, name, sort, status) SELECT 3, '冰箱', 4, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='冰箱' AND parent_id=3);
-INSERT INTO category (parent_id, name, sort, status) SELECT 3, '洗衣机', 5, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='洗衣机' AND parent_id=3);
-INSERT INTO category (parent_id, name, sort, status) SELECT 6, '面部护肤', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='面部护肤' AND parent_id=6);
-INSERT INTO category (parent_id, name, sort, status) SELECT 6, '彩妆', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='彩妆' AND parent_id=6);
-INSERT INTO category (parent_id, name, sort, status) SELECT 7, '床上用品', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='床上用品' AND parent_id=7);
-INSERT INTO category (parent_id, name, sort, status) SELECT 7, '厨具', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='厨具' AND parent_id=7);
-INSERT INTO category (parent_id, name, sort, status) SELECT 8, '运动鞋服', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='运动鞋服' AND parent_id=8);
-INSERT INTO category (parent_id, name, sort, status) SELECT 8, '健身器材', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='健身器材' AND parent_id=8);
+INSERT INTO category (parent_id, name, sort, status) SELECT 1, '笔记本电脑', 2, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='笔记本电脑' AND parent_id=1);
+INSERT INTO category (parent_id, name, sort, status) SELECT 1, '智能设备', 3, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='智能设备' AND parent_id=1);
+
+-- 服饰鞋包 子分类
+INSERT INTO category (parent_id, name, sort, status) SELECT 2, '男装', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='男装' AND parent_id=2);
+INSERT INTO category (parent_id, name, sort, status) SELECT 2, '女装', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='女装' AND parent_id=2);
+INSERT INTO category (parent_id, name, sort, status) SELECT 2, '鞋靴', 2, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='鞋靴' AND parent_id=2);
+INSERT INTO category (parent_id, name, sort, status) SELECT 2, '箱包', 3, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='箱包' AND parent_id=2);
+
+-- 家居日用 子分类
+INSERT INTO category (parent_id, name, sort, status) SELECT 3, '床上用品', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='床上用品' AND parent_id=3);
+INSERT INTO category (parent_id, name, sort, status) SELECT 3, '厨具', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='厨具' AND parent_id=3);
+INSERT INTO category (parent_id, name, sort, status) SELECT 3, '收纳整理', 2, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='收纳整理' AND parent_id=3);
+
+-- 食品饮料 子分类
+INSERT INTO category (parent_id, name, sort, status) SELECT 4, '零食', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='零食' AND parent_id=4);
+INSERT INTO category (parent_id, name, sort, status) SELECT 4, '饮品', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='饮品' AND parent_id=4);
+INSERT INTO category (parent_id, name, sort, status) SELECT 4, '生鲜', 2, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='生鲜' AND parent_id=4);
+
+-- 美妆个护 子分类
+INSERT INTO category (parent_id, name, sort, status) SELECT 5, '面部护肤', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='面部护肤' AND parent_id=5);
+INSERT INTO category (parent_id, name, sort, status) SELECT 5, '彩妆', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='彩妆' AND parent_id=5);
+INSERT INTO category (parent_id, name, sort, status) SELECT 5, '个人护理', 2, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='个人护理' AND parent_id=5);
+
+-- 运动户外 子分类
+INSERT INTO category (parent_id, name, sort, status) SELECT 6, '运动鞋服', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='运动鞋服' AND parent_id=6);
+INSERT INTO category (parent_id, name, sort, status) SELECT 6, '健身器材', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='健身器材' AND parent_id=6);
+INSERT INTO category (parent_id, name, sort, status) SELECT 6, '户外装备', 2, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='户外装备' AND parent_id=6);
+
+-- 母婴玩具 子分类
+INSERT INTO category (parent_id, name, sort, status) SELECT 7, '婴儿用品', 0, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='婴儿用品' AND parent_id=7);
+INSERT INTO category (parent_id, name, sort, status) SELECT 7, '玩具', 1, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='玩具' AND parent_id=7);
+INSERT INTO category (parent_id, name, sort, status) SELECT 7, '孕产护理', 2, 0 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM category WHERE name='孕产护理' AND parent_id=7);
 
 -- ==================== product 商品表 ====================
 CREATE TABLE IF NOT EXISTS product (
@@ -181,3 +199,82 @@ INSERT IGNORE INTO seckill_item (id, activity_id, sku_id, seckill_price, seckill
 (6, 1, 29, 2699.00, 15, 3299.00, 2),
 (7, 1, 74, 499.00, 30, 599.00, 2),
 (8, 1, 54, 799.00, 25, 950.00, 1);
+
+-- ========== 迁移：添加 signature 列（已有则报错但不中断，continue-on-error=true） ==========
+ALTER TABLE user ADD COLUMN signature VARCHAR(200) DEFAULT NULL AFTER avatar;
+
+-- ==================== coupon_template 优惠券模板表 ====================
+CREATE TABLE IF NOT EXISTS coupon_template (
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name        VARCHAR(100) NOT NULL,
+    discount    DECIMAL(10,2) NOT NULL,
+    min_amount  DECIMAL(10,2) NOT NULL DEFAULT 0,
+    total       INT NOT NULL DEFAULT 0,
+    remain      INT NOT NULL DEFAULT 0,
+    start_date  DATE NOT NULL,
+    end_date    DATE NOT NULL,
+    status      TINYINT DEFAULT 1,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ==================== user_coupon 用户优惠券表 ====================
+CREATE TABLE IF NOT EXISTS user_coupon (
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id     BIGINT NOT NULL,
+    template_id BIGINT NOT NULL,
+    status      TINYINT DEFAULT 0,
+    used_at     DATETIME DEFAULT NULL,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id),
+    INDEX idx_template_id (template_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ==================== review 评价表 ====================
+CREATE TABLE IF NOT EXISTS review (
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id     BIGINT NOT NULL,
+    order_id    BIGINT NOT NULL,
+    product_id  BIGINT NOT NULL,
+    rating      TINYINT NOT NULL DEFAULT 5,
+    content     TEXT,
+    images      TEXT,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_product_id (product_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_order_id (order_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ==================== favorite 收藏表 ====================
+CREATE TABLE IF NOT EXISTS favorite (
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id     BIGINT NOT NULL,
+    product_id  BIGINT NOT NULL,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_user_product (user_id, product_id),
+    INDEX idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ==================== 分类迁移（旧→新7大类） ====================
+-- 清理旧子分类
+DELETE FROM category WHERE parent_id IN (1,2,3,4,5,6,7,8,9,10,11) AND parent_id != 0;
+-- 清理旧顶级分类（保留7个重命名）
+DELETE FROM category WHERE parent_id = 0 AND name NOT IN ('数码家电','服饰鞋包','家居日用','食品饮料','美妆个护','运动户外','母婴玩具');
+-- 更新7大类的sort
+UPDATE category SET parent_id=0, sort=0 WHERE name='数码家电' AND parent_id IN (0,1);
+UPDATE category SET parent_id=0, sort=1 WHERE name='服饰鞋包' AND parent_id IN (0,4);
+UPDATE category SET parent_id=0, sort=2 WHERE name='家居日用' AND parent_id IN (0,7);
+UPDATE category SET parent_id=0, sort=3 WHERE name='食品饮料' AND parent_id IN (0,5);
+UPDATE category SET parent_id=0, sort=4 WHERE name='美妆个护' AND parent_id IN (0,6);
+UPDATE category SET parent_id=0, sort=5 WHERE name='运动户外' AND parent_id IN (0,8);
+UPDATE category SET parent_id=0, sort=6 WHERE name='母婴玩具' AND parent_id IN (0,9);
+-- 删除不在7大类中的旧顶级分类
+DELETE FROM category WHERE parent_id=0 AND name NOT IN ('数码家电','服饰鞋包','家居日用','食品饮料','美妆个护','运动户外','母婴玩具');
+-- 更新商品category_id到新分类
+UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE name='数码家电' AND parent_id=0) AS t) WHERE category_id IN (1,2,3);
+UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE name='服饰鞋包' AND parent_id=0) AS t) WHERE category_id IN (4,11);
+UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE name='家居日用' AND parent_id=0) AS t) WHERE category_id=7;
+UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE name='食品饮料' AND parent_id=0) AS t) WHERE category_id=5;
+UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE name='美妆个护' AND parent_id=0) AS t) WHERE category_id=6;
+UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE name='运动户外' AND parent_id=0) AS t) WHERE category_id=8;
+UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE name='母婴玩具' AND parent_id=0) AS t) WHERE category_id IN (9,10);

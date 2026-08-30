@@ -34,6 +34,9 @@ public class User {
     /** 头像 URL，可空（对应 avatar） */
     private String avatar;
 
+    /** 个性签名，可空（对应 signature） */
+    private String signature;
+
     /** 角色：0买家 / 1商家 / 2管理员（对应 role） */
     private Integer role;
 
@@ -97,6 +100,14 @@ public class User {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
     public Integer getRole() {

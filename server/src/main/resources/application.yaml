@@ -9,6 +9,7 @@ spring:
       mode: always
       schema-locations: classpath:schema.sql
       data-locations: classpath:data-products.sql
+      continue-on-error: true
   datasource:
     url: "jdbc:mysql://localhost:3306/mall?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai"
     username: root
@@ -36,7 +37,9 @@ mall:
       - /api/category/list
       - /api/product/list
       - /api/product/*
+      - /api/product/suggest
       - /api/seckill/list
+      - /api/coupon/list
 
 # ========== JWT 配置 ==========
 jwt:

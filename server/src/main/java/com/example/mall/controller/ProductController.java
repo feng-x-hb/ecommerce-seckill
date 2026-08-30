@@ -61,4 +61,9 @@ public class ProductController {
         ProductDetailVO detail = productService.detail(id);
         return Result.success(detail);
     }
+
+    @GetMapping("/suggest")
+    public Result<List<String>> suggest(@RequestParam String keyword) {
+        return Result.success(productService.suggest(keyword));
+    }
 }

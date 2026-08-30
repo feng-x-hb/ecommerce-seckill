@@ -14,6 +14,8 @@ export interface UserInfo {
   id: number
   account: string
   nickname: string
+  avatar: string
+  signature: string
   role: number
 }
 

@@ -18,10 +18,12 @@ public interface OrderService {
      * @param receiverName    收货人
      * @param receiverPhone   收货电话
      * @param receiverAddress 收货地址
+     * @param couponId        用户优惠券 id（可选，传 null 表示不使用优惠券）
      * @return 订单号
      */
     String createOrder(Long userId, List<Map<String, Object>> skuItems,
-                       String receiverName, String receiverPhone, String receiverAddress);
+                       String receiverName, String receiverPhone, String receiverAddress,
+                       Long couponId);
 
     /** 模拟支付 */
     void pay(Long userId, String orderNo);

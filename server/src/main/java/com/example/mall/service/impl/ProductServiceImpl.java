@@ -106,4 +106,18 @@ public class ProductServiceImpl implements ProductService {
         vo.setSkuList(skuList);
         return vo;
     }
+
+    @Override
+    public List<String> suggest(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return List.of();
+        }
+        List<Product> products = productMapper.selectList(
+            new LambdaQueryWrapper<Product>()
+                .like(Product::getTitle, keyword)
+                .eq(Product::getStatus, 1)
+                .last("LIMIT 10")
+        );
+        return products.stream().map(Product::getTitle).collect(Collectors.toList());
+    }
 }

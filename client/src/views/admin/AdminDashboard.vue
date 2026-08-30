@@ -17,6 +17,8 @@ const menuItems = [
   { path: '/admin/products', label: '商品管理', icon: '📦' },
   { path: '/admin/seckill', label: '秒杀活动', icon: '⚡' },
   { path: '/admin/orders', label: '订单审核', icon: '📋' },
+  { path: '/admin/users', label: '用户管理', icon: '👥' },
+  { path: '/admin/categories', label: '分类管理', icon: '📂' },
 ]
 
 const activeMenu = computed(() => route.path)

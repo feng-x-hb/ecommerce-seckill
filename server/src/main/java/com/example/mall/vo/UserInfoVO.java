@@ -23,6 +23,12 @@ public class UserInfoVO {
     /** 头像 URL */
     private String avatar;
 
+    /** 个性签名 */
+    private String signature;
+
+    /** 手机号 */
+    private String phone;
+
     /** 角色：0买家 / 1商家 / 2管理员 */
     private Integer role;
 
@@ -56,6 +62,22 @@ public class UserInfoVO {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Integer getRole() {

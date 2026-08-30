@@ -7,6 +7,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getProductDetail } from '@/api/product'
 import { addToCart } from '@/api/cart'
+import { toggleFavorite, checkFavorite } from '@/api/favorite'
+import { getProductReviews } from '@/api/review'
 import type { Product, Sku } from '@/types'
 import { ElMessage } from 'element-plus'
 
@@ -16,6 +18,9 @@ const product = ref<Product | null>(null)
 const selectedSku = ref<Sku | null>(null)
 const quantity = ref(1)
 const loading = ref(true)
+const isFavorited = ref(false)
+const reviews = ref<any[]>([])
+const reviewTotal = ref(0)
 
 async function fetchProduct() {
   loading.value = true
@@ -49,7 +54,30 @@ function handleBuyNow() {
   handleAddCart().then(() => router.push('/cart'))
 }
 
-onMounted(fetchProduct)
+async function handleToggleFavorite() {
+  try {
+    await toggleFavorite(Number(route.params.id))
+    isFavorited.value = !isFavorited.value
+    ElMessage.success(isFavorited.value ? '已收藏' : '已取消收藏')
+  } catch { /* interceptor handles */ }
+}
+
+async function fetchReviews() {
+  try {
+    const res: any = await getProductReviews(Number(route.params.id), { page: 1, size: 5 })
+    reviews.value = res.data.list || []
+    reviewTotal.value = res.data.total || 0
+  } catch { /* ignore */ }
+}
+
+onMounted(async () => {
+  await fetchProduct()
+  fetchReviews()
+  try {
+    const res: any = await checkFavorite(Number(route.params.id))
+    isFavorited.value = res.data
+  } catch { /* ignore */ }
+})
 </script>
 
 <template>
@@ -69,7 +97,8 @@ onMounted(fetchProduct)
         <!-- 左侧商品图 -->
         <div class="detail-image">
           <div class="big-image" :style="{ background: `hsl(${product.id * 47 % 360}, 60%, 85%)` }">
-            <span class="big-icon">{{ product.title.charAt(0) }}</span>
+            <img v-if="product.mainImage" :src="product.mainImage" :alt="product.title" class="detail-img" @error="($event.target as HTMLImageElement).style.display='none'" />
+            <span v-if="!product.mainImage" class="big-icon">{{ product.title.charAt(0) }}</span>
           </div>
         </div>
 
@@ -121,6 +150,27 @@ onMounted(fetchProduct)
             <el-button size="large" @click="handleAddCart" :disabled="!selectedSku || selectedSku.stock <= 0">
               加入购物车
             </el-button>
+            <el-button size="large" :type="isFavorited ? 'danger' : 'default'" @click="handleToggleFavorite">
+              {{ isFavorited ? '❤ 已收藏' : '♡ 收藏' }}
+            </el-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 评价区域 -->
+      <div class="review-section card" v-if="reviews.length || reviewTotal > 0">
+        <div class="section-header">
+          <h3>商品评价</h3>
+          <span class="review-count">共 {{ reviewTotal }} 条评价</span>
+        </div>
+        <div class="review-list">
+          <div v-for="r in reviews" :key="r.id" class="review-item">
+            <div class="review-user">
+              <span class="review-name">{{ r.nickname }}</span>
+              <span class="review-stars">{{ '★'.repeat(r.rating) }}{{ '☆'.repeat(5 - r.rating) }}</span>
+              <span class="review-time">{{ r.createdAt?.slice(0, 10) }}</span>
+            </div>
+            <div class="review-content">{{ r.content }}</div>
           </div>
         </div>
       </div>
@@ -164,6 +214,13 @@ onMounted(fetchProduct)
   font-size: 80px;
   color: rgba(255,255,255,0.7);
   font-weight: bold;
+}
+.detail-img {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  z-index: 2;
 }
 
 .detail-info {
@@ -238,5 +295,61 @@ onMounted(fetchProduct)
   display: flex;
   gap: 16px;
   margin-top: 24px;
+}
+
+.review-section {
+  margin-top: 24px;
+  padding: 24px 30px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.section-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+.review-count {
+  font-size: 13px;
+  color: #999;
+}
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.review-item {
+  padding: 14px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.review-item:last-child {
+  border-bottom: none;
+}
+.review-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.review-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+.review-stars {
+  color: #ff9900;
+  font-size: 14px;
+}
+.review-time {
+  font-size: 12px;
+  color: #ccc;
+}
+.review-content {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
 }
 </style>

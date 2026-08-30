@@ -9,6 +9,11 @@ const router = createRouter({
   routes: [
     { path: '/login', name: 'Login', component: () => import('@/views/LoginView.vue') },
     { path: '/', name: 'Home', component: () => import('@/views/HomeView.vue') },
+    { path: '/search', name: 'Search', component: () => import('@/views/SearchView.vue') },
+    { path: '/category/:id', name: 'Category', component: () => import('@/views/CategoryView.vue') },
+    { path: '/profile', name: 'Profile', component: () => import('@/views/ProfileView.vue') },
+    { path: '/favorites', name: 'Favorites', component: () => import('@/views/FavoritesView.vue') },
+    { path: '/coupons', name: 'Coupons', component: () => import('@/views/CouponCenter.vue') },
     { path: '/seckill', name: 'Seckill', component: () => import('@/views/SeckillView.vue') },
     { path: '/product/:id', name: 'ProductDetail', component: () => import('@/views/ProductDetailView.vue') },
     { path: '/cart', name: 'Cart', component: () => import('@/views/CartView.vue') },
@@ -37,6 +42,8 @@ const router = createRouter({
         { path: 'products', name: 'AdminProducts', component: () => import('@/views/admin/AdminProductView.vue') },
         { path: 'seckill', name: 'AdminSeckill', component: () => import('@/views/admin/AdminSeckillView.vue') },
         { path: 'orders', name: 'AdminOrders', component: () => import('@/views/admin/AdminOrderView.vue') },
+        { path: 'users', name: 'AdminUsers', component: () => import('@/views/admin/AdminUserView.vue') },
+        { path: 'categories', name: 'AdminCategories', component: () => import('@/views/admin/AdminCategoryView.vue') },
       ]
     },
     { path: '/about', name: 'About', component: () => import('@/views/AboutView.vue') },
@@ -48,7 +55,7 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const token = localStorage.getItem('token')
-  const publicPages = ['Login', 'Home', 'ProductDetail', 'ForgotPassword', 'MerchantLogin', 'About', 'Contact', 'Merchant']
+  const publicPages = ['Login', 'Home', 'Search', 'Category', 'Profile', 'Favorites', 'Coupons', 'ProductDetail', 'Seckill', 'ForgotPassword', 'MerchantLogin', 'About', 'Contact', 'Merchant']
   if (!publicPages.includes(to.name as string) && !token) {
     return { name: 'Login' }
   }

@@ -171,9 +171,9 @@ function handleLogout() {
   align-items: center;
   height: 60px;
   gap: 24px;
-  max-width: 1200px;
+  width: 70%;
+  min-width: 900px;
   margin: 0 auto;
-  padding: 0 20px;
 }
 
 /* Logo */
@@ -304,9 +304,9 @@ function handleLogout() {
   align-items: center;
   height: 36px;
   gap: 0;
-  max-width: 1200px;
+  width: 70%;
+  min-width: 900px;
   margin: 0 auto;
-  padding: 0 20px;
   overflow-x: auto;
 }
 .nav-link {

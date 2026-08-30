@@ -79,7 +79,7 @@ onMounted(() => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2px solid rgba(225, 37, 27, 0.3);
+  border: 2px solid rgba(0, 0, 0, 0.08);
   background: linear-gradient(135deg, #fff, #f8f8f8);
   color: #e1251b;
   cursor: pointer;
@@ -87,7 +87,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   transition: all 0.3s;
-  box-shadow: 0 2px 12px rgba(225, 37, 27, 0.15);
+  box-shadow: var(--jd-shadow, 0 2px 12px rgba(0,0,0,0.08));
 }
 .global-theme-toggle.dark {
   background: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -97,7 +97,7 @@ onMounted(() => {
 }
 .global-theme-toggle:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 20px rgba(225, 37, 27, 0.25);
+  box-shadow: var(--jd-shadow-hover, 0 4px 20px rgba(0,0,0,0.15));
 }
 .global-theme-toggle.dark:hover {
   box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);

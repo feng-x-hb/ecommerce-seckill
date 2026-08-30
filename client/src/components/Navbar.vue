@@ -195,7 +195,7 @@ function handleLogout() {
 
 .main-nav {
   background: linear-gradient(135deg, #e1251b 0%, #ff4e3a 50%, #e1251b 100%);
-  box-shadow: 0 4px 20px rgba(225,37,27,0.3);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
   width: 100%;
 }
 .main-nav-inner {

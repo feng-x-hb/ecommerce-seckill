@@ -194,16 +194,7 @@ onMounted(fetchOrders)
 
     <!-- ========== 空状态 ========== -->
     <div v-if="!loading && orders.length === 0" class="empty-state">
-      <div class="empty-illustration">
-        <div class="empty-box">
-          <div class="box-lid"></div>
-          <div class="box-body"></div>
-          <div class="box-star">📦</div>
-        </div>
-        <div class="empty-sparkles">
-          <span class="sparkle" v-for="i in 6" :key="i" :style="{ animationDelay: i * 0.3 + 's' }">✦</span>
-        </div>
-      </div>
+      <div class="empty-icon">📦</div>
       <p class="empty-text">暂无订单</p>
       <p class="empty-sub">快去挑选心仪的商品吧</p>
       <router-link to="/" class="empty-btn">去首页逛逛</router-link>
@@ -305,52 +296,14 @@ onMounted(fetchOrders)
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
   border: 1px solid #f0f0f0;
   overflow: hidden;
-  transition: all 0.35s;
-  animation: cardSlideIn 0.5s ease backwards;
+  transition: box-shadow 0.3s, transform 0.3s;
 }
-.order-card:nth-child(1) { animation-delay: 0s; }
-.order-card:nth-child(2) { animation-delay: 0.08s; }
-.order-card:nth-child(3) { animation-delay: 0.16s; }
-.order-card:nth-child(4) { animation-delay: 0.24s; }
-.order-card:nth-child(5) { animation-delay: 0.32s; }
-@keyframes cardSlideIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.order-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(225,37,27,0.1);
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
-  z-index: 0;
-}
-.order-card:hover::before { opacity: 1; }
 .order-card:hover {
-  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
-  transform: translateY(-3px);
+  box-shadow: var(--jd-shadow-hover, 0 8px 24px rgba(0,0,0,0.12));
 }
 .status-bar {
   height: 4px;
   width: 100%;
-  position: relative;
-  overflow: hidden;
-}
-.status-bar::after {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%; right: 0; bottom: 0;
-  width: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-  animation: statusShine 3s ease-in-out infinite;
-}
-@keyframes statusShine {
-  0% { left: -100%; }
-  50% { left: 100%; }
-  100% { left: 100%; }
 }
 
 .order-header {
@@ -373,13 +326,7 @@ onMounted(fetchOrders)
   border-radius: 20px;
   color: #fff;
   font-size: 12px;
-  font-weight: bold;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  animation: badgePulse 2s ease-in-out infinite;
-}
-@keyframes badgePulse {
-  0%, 100% { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  50% { box-shadow: 0 2px 16px rgba(0,0,0,0.2); }
+  font-weight: 600;
 }
 
 .order-body {
@@ -416,103 +363,29 @@ onMounted(fetchOrders)
   transition: all 0.3s;
 }
 .pay-btn {
-  background: linear-gradient(135deg, #e1251b, #ff4e3a) !important;
+  background: var(--jd-red, #e1251b) !important;
   border: none !important;
-  box-shadow: 0 2px 8px rgba(225,37,27,0.2);
-  position: relative;
-  overflow: hidden;
 }
-.pay-btn::after {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%; right: 0; bottom: 0;
-  width: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  transition: none;
-}
-.pay-btn:hover::after {
-  animation: btnShine 0.6s ease forwards;
-}
-@keyframes btnShine {
-  0% { left: -100%; }
-  100% { left: 100%; }
-}
-.pay-btn:hover { box-shadow: 0 4px 16px rgba(225,37,27,0.3); transform: translateY(-1px); }
+.pay-btn:hover { opacity: 0.9; }
 .cancel-btn:hover { color: #e1251b !important; border-color: #e1251b !important; }
 
 /* ========== 空状态 ========== */
 .empty-state { text-align: center; padding: 60px 0; }
-.empty-illustration {
-  position: relative;
-  width: 140px;
-  height: 140px;
-  margin: 0 auto 24px;
-}
-.empty-box { position: relative; width: 100%; height: 100%; }
-.box-lid {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  right: 20px;
-  height: 24px;
-  background: linear-gradient(135deg, #ff9500, #ffb340);
-  border-radius: 8px 8px 0 0;
-  z-index: 2;
-}
-.box-body {
-  position: absolute;
-  top: 44px;
-  left: 20px;
-  right: 20px;
-  bottom: 20px;
-  background: linear-gradient(135deg, #ff6700, #ff9500);
-  border-radius: 0 0 8px 8px;
-}
-.box-star {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 48px;
-  z-index: 3;
-  animation: float 3s ease-in-out infinite;
-}
-.empty-sparkles {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  pointer-events: none;
-}
-.sparkle {
-  position: absolute;
-  color: #f5a623;
-  font-size: 14px;
-  animation: sparkleFloat 2s ease-in-out infinite;
-}
-.sparkle:nth-child(1) { top: 10%; left: 10%; }
-.sparkle:nth-child(2) { top: 5%; right: 15%; }
-.sparkle:nth-child(3) { bottom: 15%; left: 5%; }
-.sparkle:nth-child(4) { top: 30%; right: 5%; }
-.sparkle:nth-child(5) { bottom: 5%; right: 20%; }
-.sparkle:nth-child(6) { top: 50%; left: 0; }
-@keyframes sparkleFloat {
-  0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
-  50% { transform: translateY(-8px) scale(1.2); opacity: 1; }
-}
-.empty-text { font-size: 18px; color: #666; font-weight: bold; margin-bottom: 8px; }
-.empty-sub { font-size: 14px; color: #999; margin-bottom: 24px; }
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-text { font-size: 18px; color: var(--jd-text-secondary, #666); font-weight: 600; margin-bottom: 8px; }
+.empty-sub { font-size: 14px; color: var(--jd-text-light, #999); margin-bottom: 24px; }
 .empty-btn {
   display: inline-block;
   padding: 10px 28px;
-  background: linear-gradient(135deg, #e1251b, #ff6700);
+  background: var(--jd-red, #e1251b);
   color: #fff;
-  border-radius: 24px;
+  border-radius: var(--jd-radius-sm, 8px);
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 500;
   text-decoration: none;
-  transition: all 0.3s;
-  box-shadow: 0 4px 16px rgba(225,37,27,0.3);
+  transition: background 0.3s;
 }
-.empty-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(225,37,27,0.4); }
+.empty-btn:hover { background: var(--jd-red-hover, #c81623); color: #fff; }
 
 .pagination { display: flex; justify-content: center; padding: 20px 0; }
 </style>

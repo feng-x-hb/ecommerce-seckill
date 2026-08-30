@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * 秒杀专场页 - 华丽版 v2
- * 火焰特效头部 + 发光倒计时 + 渐变边框卡片 + 进度条
+ * 秒杀专场页 - 精简专业版
+ * 红色系头部 + 简洁倒计时 + 干净商品卡片
  */
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -48,7 +48,7 @@ async function handleBuy(item: any) {
   if (item.seckillStock <= 0) return ElMessage.warning('已抢完')
   try {
     const res: any = await request.post('/seckill/buy', { seckillItemId: item.seckillItemId })
-    ElMessage.success('🎉 抢购成功！订单号：' + res.data.orderNo)
+    ElMessage.success('抢购成功！订单号：' + res.data.orderNo)
     router.push(`/order/${res.data.orderNo}`)
   } catch { /* interceptor handles */ }
 }
@@ -62,58 +62,34 @@ onUnmounted(() => { clearInterval(timer) })
 
 <template>
   <div class="seckill-page">
-    <!-- ========== 火焰特效头部 ========== -->
+    <!-- ========== 红色系头部 ========== -->
     <div class="seckill-hero">
-      <div class="hero-bg">
-        <div class="fire-particle" v-for="i in 30" :key="i" :style="{
-          left: Math.random() * 100 + '%',
-          animationDelay: Math.random() * 3 + 's',
-          animationDuration: (Math.random() * 2 + 2) + 's'
-        }"></div>
-      </div>
       <div class="hero-content container">
         <div class="hero-left">
-          <div class="hero-badge animate-pulse">⚡</div>
           <h1 class="hero-title">
-            <span class="title-icon">🔥</span>
+            <el-icon :size="32"><Lightning /></el-icon>
             限时秒杀专场
           </h1>
           <p class="hero-sub">每日精选 · 限时限量 · 超值优惠</p>
           <div class="hero-tags">
             <span class="tag tag-red"><el-icon><Timer /></el-icon> 限时</span>
             <span class="tag tag-orange"><el-icon><Discount /></el-icon> 特价</span>
-            <span class="tag tag-gold"><el-icon><Medal /></el-icon> 爆款</span>
           </div>
         </div>
         <div class="hero-right">
-          <div class="big-countdown">
-            <div class="countdown-title">
+          <div class="countdown-box">
+            <div class="countdown-label">
               <el-icon><Clock /></el-icon> 距结束
             </div>
             <div class="countdown-display" v-if="seckillItems.length">
-              <div class="countdown-unit">
-                <span class="unit-num glow-text">{{ String(getTimeLeft(seckillItems[0]?.endTime).hours).padStart(2, '0') }}</span>
-                <span class="unit-label">时</span>
-              </div>
-              <span class="unit-sep pulse-sep">:</span>
-              <div class="countdown-unit">
-                <span class="unit-num glow-text">{{ String(getTimeLeft(seckillItems[0]?.endTime).minutes).padStart(2, '0') }}</span>
-                <span class="unit-label">分</span>
-              </div>
-              <span class="unit-sep pulse-sep">:</span>
-              <div class="countdown-unit">
-                <span class="unit-num glow-text">{{ String(getTimeLeft(seckillItems[0]?.endTime).seconds).padStart(2, '0') }}</span>
-                <span class="unit-label">秒</span>
-              </div>
+              <span class="cd-num">{{ String(getTimeLeft(seckillItems[0]?.endTime).hours).padStart(2, '0') }}</span>
+              <span class="cd-sep">:</span>
+              <span class="cd-num">{{ String(getTimeLeft(seckillItems[0]?.endTime).minutes).padStart(2, '0') }}</span>
+              <span class="cd-sep">:</span>
+              <span class="cd-num">{{ String(getTimeLeft(seckillItems[0]?.endTime).seconds).padStart(2, '0') }}</span>
             </div>
           </div>
         </div>
-      </div>
-      <!-- 波浪装饰 -->
-      <div class="wave-decoration">
-        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-          <path d="M0,60 C360,120 720,0 1080,60 C1260,90 1380,60 1440,60 L1440,120 L0,120 Z" fill="#f5f5f5"/>
-        </svg>
       </div>
     </div>
 
@@ -121,7 +97,7 @@ onUnmounted(() => { clearInterval(timer) })
     <div class="seckill-content container" v-loading="loading">
       <div class="section-header">
         <div class="section-title-group">
-          <span class="title-icon-box" style="background:linear-gradient(135deg,#e1251b,#ff6700)"><el-icon :size="18" color="#fff"><Lightning /></el-icon></span>
+          <span class="title-icon-box"><el-icon :size="18" color="#fff"><Lightning /></el-icon></span>
           <h2 class="section-title">爆款秒杀</h2>
           <span class="title-line"></span>
         </div>
@@ -131,8 +107,7 @@ onUnmounted(() => { clearInterval(timer) })
       </div>
 
       <div class="seckill-grid">
-        <div v-for="(item, index) in seckillItems" :key="item.seckillItemId" class="seckill-card" :style="{ animationDelay: index * 0.15 + 's' }">
-          <!-- 排名标签 -->
+        <div v-for="(item, index) in seckillItems" :key="item.seckillItemId" class="seckill-card">
           <div class="rank-badge" :class="'rank-' + (index + 1)">
             <el-icon v-if="index === 0"><Trophy /></el-icon>
             <el-icon v-else-if="index === 1"><Medal /></el-icon>
@@ -140,28 +115,26 @@ onUnmounted(() => { clearInterval(timer) })
             {{ index === 0 ? 'TOP1' : index === 1 ? 'TOP2' : 'TOP3' }}
           </div>
 
-          <!-- 商品图 -->
           <div class="card-image">
-            <div class="placeholder-img" :style="{ background: `linear-gradient(135deg, hsl(${item.skuId * 47 % 360}, 70%, 80%), hsl(${item.skuId * 47 % 360 + 30}, 70%, 70%))` }">
-              <span class="placeholder-icon">{{ item.productName?.charAt(0) }}</span>
+            <div class="placeholder-img" :style="{ background: `linear-gradient(135deg, hsl(${item.skuId * 47 % 360}, 55%, 88%), hsl(${item.skuId * 47 % 360 + 30}, 55%, 80%))` }">
+              <svg class="placeholder-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="12" y="16" width="40" height="32" rx="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+                <path d="M16 40 L24 30 L30 36 L42 22 L48 30" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+                <circle cx="22" cy="26" r="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+              </svg>
             </div>
-            <!-- 库存进度条 -->
             <div class="stock-progress">
-              <div class="stock-fill" :style="{ width: getStockPercent(item) + '%' }">
-                <div class="stock-shine"></div>
-              </div>
+              <div class="stock-fill" :style="{ width: getStockPercent(item) + '%' }"></div>
               <span class="stock-text">已抢 {{ getStockPercent(item) }}%</span>
             </div>
           </div>
 
-          <!-- 商品信息 -->
           <div class="card-body">
             <div class="product-name ellipsis-2">{{ item.productName }}</div>
             <div class="product-spec">
               <el-icon><Tag /></el-icon> {{ item.specs }}
             </div>
 
-            <!-- 价格区 -->
             <div class="price-section">
               <div class="price-row">
                 <span class="seckill-price">
@@ -176,18 +149,15 @@ onUnmounted(() => { clearInterval(timer) })
               </div>
             </div>
 
-            <!-- 限购信息 -->
             <div class="limit-info">
               <el-icon><Warning /></el-icon>
               限购 {{ item.purchaseLimit }} 件 · 剩余 {{ item.seckillStock }} 件
             </div>
 
-            <!-- 抢购按钮 -->
             <el-button
               type="primary"
               size="large"
               class="buy-btn"
-              :class="{ 'btn-disabled': item.seckillStock <= 0 || item.activityStatus !== 1 }"
               :disabled="item.seckillStock <= 0 || item.activityStatus !== 1"
               @click="handleBuy(item)"
             >
@@ -200,14 +170,7 @@ onUnmounted(() => { clearInterval(timer) })
       </div>
 
       <div v-if="!loading && seckillItems.length === 0" class="empty-state">
-        <div class="empty-illustration">
-          <div class="empty-lightning">⚡</div>
-          <div class="empty-rings">
-            <div class="ring ring-1"></div>
-            <div class="ring ring-2"></div>
-            <div class="ring ring-3"></div>
-          </div>
-        </div>
+        <div class="empty-icon">⚡</div>
         <p class="empty-text">暂无秒杀活动</p>
         <p class="empty-sub">敬请期待下一场秒杀</p>
         <router-link to="/" class="empty-btn">去首页逛逛</router-link>
@@ -217,203 +180,145 @@ onUnmounted(() => { clearInterval(timer) })
 </template>
 
 <style scoped>
-/* ========== 火焰头部 ========== */
+/* ========== 头部 ========== */
 .seckill-hero {
-  background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(135deg, #e1251b, #ff6700);
   padding: 0;
 }
-.hero-bg {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-}
-.fire-particle {
-  position: absolute;
-  bottom: 0;
-  width: 4px;
-  height: 4px;
-  background: #ff6b35;
-  border-radius: 50%;
-  animation: fireRise 3s ease-in infinite;
-  box-shadow: 0 0 8px #ff6b35, 0 0 16px rgba(255,107,53,0.4);
-}
-.fire-particle:nth-child(3n) { background: #ffd700; box-shadow: 0 0 8px #ffd700, 0 0 16px rgba(255,215,0,0.4); width: 3px; height: 3px; }
-.fire-particle:nth-child(5n) { background: #ff4e3a; box-shadow: 0 0 8px #ff4e3a, 0 0 16px rgba(255,78,58,0.4); width: 5px; height: 5px; }
-@keyframes fireRise {
-  0% { opacity: 1; transform: translateY(0) scale(1); }
-  50% { opacity: 0.8; }
-  100% { opacity: 0; transform: translateY(-250px) scale(0); }
-}
-
 .hero-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 50px 15px 80px;
-  position: relative;
-  z-index: 2;
+  padding: var(--sp-12, 48px) var(--sp-4, 16px) var(--sp-12, 48px);
 }
 .hero-left { color: #fff; }
-.hero-badge { font-size: 48px; margin-bottom: 12px; filter: drop-shadow(0 0 20px rgba(255,215,0,0.6)); }
-.hero-title { font-size: 36px; font-weight: bold; display: flex; align-items: center; gap: 12px; text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
-.title-icon { font-size: 40px; }
-.hero-sub { font-size: 16px; opacity: 0.85; margin-top: 8px; text-shadow: 0 1px 4px rgba(0,0,0,0.2); }
-.hero-tags { display: flex; gap: 8px; margin-top: 16px; }
+.hero-title {
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3, 12px);
+}
+.hero-sub {
+  font-size: 15px;
+  opacity: 0.85;
+  margin-top: var(--sp-2, 8px);
+}
+.hero-tags {
+  display: flex;
+  gap: var(--sp-2, 8px);
+  margin-top: var(--sp-4, 16px);
+}
+.hero-tags .tag { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); }
 
-.big-countdown {
-  background: rgba(255,255,255,0.08);
-  border-radius: 20px;
-  padding: 28px 36px;
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.15);
+.countdown-box {
+  background: rgba(255,255,255,0.12);
+  border-radius: var(--jd-radius, 12px);
+  padding: var(--sp-5, 20px) var(--sp-6, 24px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
   text-align: center;
   color: #fff;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  position: relative;
-  overflow: hidden;
 }
-.big-countdown::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(from 0deg, transparent, rgba(225,37,27,0.1), transparent, rgba(255,103,0,0.1), transparent);
-  animation: rotateBg 8s linear infinite;
-  pointer-events: none;
-}
-@keyframes rotateBg {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.countdown-title {
+.countdown-label {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 13px;
   opacity: 0.85;
-  margin-bottom: 14px;
+  margin-bottom: var(--sp-3, 12px);
 }
-.countdown-display { display: flex; align-items: center; gap: 10px; }
-.countdown-unit { text-align: center; }
-.unit-num {
-  display: block;
-  background: linear-gradient(135deg, #e1251b, #ff6700);
-  padding: 12px 18px;
-  border-radius: 10px;
-  font-size: 30px;
-  font-weight: bold;
-  min-width: 64px;
-  box-shadow: 0 4px 16px rgba(225,37,27,0.4);
+.countdown-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.glow-text {
-  text-shadow: 0 0 12px rgba(255,107,53,0.8);
-  animation: glowPulse 2s ease-in-out infinite;
+.cd-num {
+  display: inline-block;
+  background: rgba(0,0,0,0.2);
+  padding: 8px 14px;
+  border-radius: var(--jd-radius-sm, 8px);
+  font-size: 24px;
+  font-weight: 700;
+  min-width: 52px;
+  font-variant-numeric: tabular-nums;
 }
-@keyframes glowPulse {
-  0%, 100% { text-shadow: 0 0 12px rgba(255,107,53,0.6); }
-  50% { text-shadow: 0 0 24px rgba(255,107,53,1), 0 0 48px rgba(255,107,53,0.4); }
+.cd-sep {
+  font-size: 24px;
+  font-weight: 700;
+  opacity: 0.7;
 }
-.pulse-sep { animation: sepPulse 1s ease-in-out infinite; }
-@keyframes sepPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-.unit-label { font-size: 12px; opacity: 0.75; margin-top: 6px; display: block; }
-.unit-sep { font-size: 30px; font-weight: bold; color: #ff6700; }
 
-.wave-decoration {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+/* ========== 内容区 ========== */
+.seckill-content { padding: var(--sp-8, 32px) var(--sp-4, 16px); }
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sp-6, 24px);
 }
-.wave-decoration svg { display: block; width: 100%; height: 60px; }
-
-/* ========== 秒杀内容 ========== */
-.seckill-content { padding: 30px 15px; }
-.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.section-title-group { display: flex; align-items: center; gap: 10px; }
+.section-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3, 12px);
+}
 .title-icon-box {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: var(--jd-radius-sm, 8px);
+  background: linear-gradient(135deg, var(--jd-red, #e1251b), var(--jd-orange, #ff6700));
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
-.section-title { font-size: 22px; font-weight: bold; }
+.section-title { font-size: 20px; font-weight: 700; }
 .title-line {
-  width: 40px;
+  width: 32px;
   height: 3px;
   border-radius: 2px;
-  background: linear-gradient(90deg, #e1251b, transparent);
+  background: linear-gradient(90deg, var(--jd-red, #e1251b), transparent);
 }
-.section-desc { font-size: 13px; color: #999; display: flex; align-items: center; gap: 4px; }
+.section-desc { font-size: 13px; color: var(--jd-text-light, #999); display: flex; align-items: center; gap: 4px; }
 
+/* ========== 商品网格 ========== */
 .seckill-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: var(--sp-5, 20px);
 }
 .seckill-card {
   position: relative;
-  border-radius: 14px;
+  border-radius: var(--jd-radius, 12px);
   overflow: visible;
   background: #fff;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-  border: 2px solid transparent;
-  transition: all 0.35s;
-}
-.seckill-card::before {
-  content: '';
-  position: absolute;
-  top: -2px; left: -2px; right: -2px; bottom: -2px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #e1251b, #ff6700, #f5a623, #e1251b);
-  background-size: 300% 300%;
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-.seckill-card:hover::before {
-  opacity: 1;
-  animation: gradientShift 3s ease infinite;
+  box-shadow: var(--jd-shadow, 0 2px 12px rgba(0,0,0,0.08));
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .seckill-card:hover {
-  border-color: transparent;
-  box-shadow: 0 12px 40px rgba(225,37,27,0.2);
-  transform: translateY(-8px);
+  transform: translateY(-6px);
+  box-shadow: var(--jd-shadow-hover, 0 8px 24px rgba(0,0,0,0.12));
 }
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+
 .rank-badge {
   position: absolute;
   top: -1px;
   right: 16px;
   padding: 5px 14px;
-  border-radius: 0 0 10px 10px;
+  border-radius: 0 0 var(--jd-radius-sm, 8px) var(--jd-radius-sm, 8px);
   color: #fff;
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 4px;
   z-index: 1;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
-.rank-1 { background: linear-gradient(135deg, #e1251b, #ff4e3a); }
-.rank-2 { background: linear-gradient(135deg, #ff6700, #ff9500); }
-.rank-3 { background: linear-gradient(135deg, #f5a623, #f7c948); }
+.rank-1 { background: var(--jd-red, #e1251b); }
+.rank-2 { background: var(--jd-orange, #ff6700); }
+.rank-3 { background: #f5a623; }
 
-.card-image { position: relative; padding-top: 100%; border-radius: 12px 12px 0 0; overflow: hidden; }
+.card-image { position: relative; padding-top: 100%; border-radius: var(--jd-radius, 12px) var(--jd-radius, 12px) 0 0; overflow: hidden; }
 .placeholder-img {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -422,8 +327,8 @@ onUnmounted(() => { clearInterval(timer) })
   justify-content: center;
   transition: transform 0.4s;
 }
-.seckill-card:hover .placeholder-img { transform: scale(1.05); }
-.placeholder-icon { font-size: 56px; color: rgba(255,255,255,0.7); font-weight: bold; }
+.seckill-card:hover .placeholder-img { transform: scale(1.04); }
+.placeholder-svg { width: 56px; height: 56px; color: rgba(255,255,255,0.6); }
 
 .stock-progress {
   position: absolute;
@@ -431,8 +336,7 @@ onUnmounted(() => { clearInterval(timer) })
   left: 0;
   right: 0;
   height: 28px;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -442,51 +346,38 @@ onUnmounted(() => { clearInterval(timer) })
   left: 0;
   top: 0;
   bottom: 0;
-  background: linear-gradient(90deg, #ff4e3a, #e1251b, #ff6700);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
+  background: linear-gradient(90deg, var(--jd-red, #e1251b), var(--jd-orange, #ff6700));
   transition: width 0.8s ease;
 }
-.stock-shine {
-  position: absolute;
-  top: 0; right: 0; bottom: 0;
-  width: 30px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  animation: shineMove 2s infinite;
-}
-@keyframes shineMove {
-  0% { transform: translateX(-30px); }
-  100% { transform: translateX(30px); }
-}
-.stock-text { position: relative; z-index: 1; color: #fff; font-size: 12px; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.stock-text { position: relative; z-index: 1; color: #fff; font-size: 12px; font-weight: 500; }
 
-.card-body { padding: 16px; }
-.product-name { font-size: 14px; font-weight: bold; margin-bottom: 6px; line-height: 1.4; height: 40px; }
-.product-spec { font-size: 12px; color: #999; margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
+.card-body { padding: var(--sp-4, 16px); }
+.product-name { font-size: 14px; font-weight: 500; margin-bottom: var(--sp-1, 4px); line-height: 1.4; height: 40px; }
+.product-spec { font-size: 12px; color: var(--jd-text-light, #999); margin-bottom: var(--sp-3, 12px); display: flex; align-items: center; gap: 4px; }
 
-.price-section { margin-bottom: 8px; }
-.price-row { display: flex; align-items: baseline; gap: 8px; }
-.seckill-price { color: var(--jd-red); }
+.price-section { margin-bottom: var(--sp-2, 8px); }
+.price-row { display: flex; align-items: baseline; gap: var(--sp-2, 8px); }
+.seckill-price { color: var(--jd-red, #e1251b); }
 .price-symbol { font-size: 14px; }
-.price-num { font-size: 24px; font-weight: bold; }
-.normal-price { font-size: 13px; color: #ccc; text-decoration: line-through; }
+.price-num { font-size: 24px; font-weight: 700; }
+.normal-price { font-size: 13px; color: var(--jd-text-muted, #bbb); text-decoration: line-through; }
 .discount-tag {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 11px;
-  color: var(--jd-orange);
-  background: linear-gradient(135deg, #fff5f0, #fff0e8);
+  color: var(--jd-orange, #ff6700);
+  background: var(--jd-red-light, #fff0f0);
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: var(--jd-radius-pill, 999px);
   margin-top: 4px;
   border: 1px solid #ffe0d0;
 }
 
 .limit-info {
   font-size: 12px;
-  color: #999;
-  margin-bottom: 12px;
+  color: var(--jd-text-light, #999);
+  margin-bottom: var(--sp-3, 12px);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -494,94 +385,30 @@ onUnmounted(() => { clearInterval(timer) })
 
 .buy-btn {
   width: 100%;
-  height: 44px;
-  font-size: 16px;
-  border-radius: 22px;
-  font-weight: bold;
-  letter-spacing: 2px;
-  background: linear-gradient(135deg, #e1251b, #ff4e3a) !important;
-  border: none !important;
-  transition: all 0.3s;
-  box-shadow: 0 4px 16px rgba(225,37,27,0.3);
-  position: relative;
-  overflow: hidden;
-}
-.buy-btn::after {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%; right: 0; bottom: 0;
-  width: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  transition: none;
-}
-.buy-btn:hover:not(.btn-disabled)::after {
-  animation: btnShine 0.6s ease forwards;
-}
-@keyframes btnShine {
-  0% { left: -100%; }
-  100% { left: 100%; }
-}
-.buy-btn:hover:not(.btn-disabled) {
-  transform: scale(1.03);
-  box-shadow: 0 8px 28px rgba(225,37,27,0.45);
-}
-.btn-disabled {
-  background: linear-gradient(135deg, #ccc, #ddd) !important;
-  box-shadow: none !important;
+  height: 42px;
+  font-size: 15px;
+  border-radius: var(--jd-radius-sm, 8px);
+  font-weight: 600;
+  letter-spacing: 1px;
 }
 
 /* ========== 空状态 ========== */
-.empty-state { text-align: center; padding: 80px 0; }
-.empty-illustration {
-  position: relative;
-  width: 120px;
-  height: 120px;
-  margin: 0 auto 24px;
-}
-.empty-lightning {
-  font-size: 56px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  animation: float 3s ease-in-out infinite;
-}
-.empty-rings {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-}
-.ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 2px solid #e1251b;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation: ringPulse 2s ease-out infinite;
-}
-.ring-1 { width: 60px; height: 60px; opacity: 0.6; animation-delay: 0s; }
-.ring-2 { width: 90px; height: 90px; opacity: 0.3; animation-delay: 0.4s; }
-.ring-3 { width: 120px; height: 120px; opacity: 0.1; animation-delay: 0.8s; }
-@keyframes ringPulse {
-  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.6; }
-  100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
-}
-.empty-text { font-size: 18px; color: #666; font-weight: bold; margin-bottom: 8px; }
-.empty-sub { font-size: 14px; color: #999; margin-bottom: 24px; }
+.empty-state { text-align: center; padding: var(--sp-12, 48px) 0; }
+.empty-icon { font-size: 48px; margin-bottom: var(--sp-4, 16px); }
+.empty-text { font-size: 18px; color: var(--jd-text-secondary, #666); font-weight: 600; margin-bottom: var(--sp-2, 8px); }
+.empty-sub { font-size: 14px; color: var(--jd-text-light, #999); margin-bottom: var(--sp-6, 24px); }
 .empty-btn {
   display: inline-block;
   padding: 10px 28px;
-  background: linear-gradient(135deg, #e1251b, #ff6700);
+  background: var(--jd-red, #e1251b);
   color: #fff;
-  border-radius: 24px;
+  border-radius: var(--jd-radius-sm, 8px);
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 500;
   text-decoration: none;
-  transition: all 0.3s;
-  box-shadow: 0 4px 16px rgba(225,37,27,0.3);
+  transition: background 0.3s;
 }
-.empty-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(225,37,27,0.4); }
+.empty-btn:hover { background: var(--jd-red-hover, #c81623); color: #fff; }
 
 @media (max-width: 1200px) { .seckill-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 900px) { .seckill-grid { grid-template-columns: repeat(2, 1fr); } }

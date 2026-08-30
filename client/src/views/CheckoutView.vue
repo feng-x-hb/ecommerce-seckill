@@ -119,8 +119,12 @@ async function handleSubmit() {
     <div class="section card">
       <h3 class="section-title">商品清单</h3>
       <div v-for="item in items" :key="item.id" class="checkout-item">
-        <div class="item-image" :style="{ background: `hsl(${item.productId * 47 % 360}, 60%, 85%)` }">
-          <span>{{ item.productName.charAt(0) }}</span>
+        <div class="item-image" :style="{ background: `linear-gradient(135deg, hsl(${item.productId * 47 % 360}, 55%, 88%), hsl(${item.productId * 47 % 360 + 30}, 55%, 80%))` }">
+          <svg class="item-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="12" y="16" width="40" height="32" rx="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+            <path d="M16 40 L24 30 L30 36 L42 22 L48 30" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+            <circle cx="22" cy="26" r="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+          </svg>
         </div>
         <div class="item-info">
           <div class="item-name ellipsis">{{ item.productName }}</div>
@@ -227,14 +231,13 @@ async function handleSubmit() {
 .item-image {
   width: 60px;
   height: 60px;
-  border-radius: 6px;
+  border-radius: var(--jd-radius-sm, 8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  color: rgba(255,255,255,0.8);
   flex-shrink: 0;
 }
+.item-svg { width: 36px; height: 36px; color: rgba(255,255,255,0.6); }
 .item-info { flex: 1; }
 .item-name { font-size: 14px; margin-bottom: 4px; }
 .item-spec { font-size: 12px; color: #999; }

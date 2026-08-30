@@ -166,6 +166,8 @@ function handleLogout() {
   width: 100%;
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: center;
 }
 .nav-top-inner {
   display: flex;
@@ -173,7 +175,6 @@ function handleLogout() {
   height: 60px;
   gap: 24px;
   width: 70%;
-  margin: 0 auto;
 }
 
 /* Logo */
@@ -299,6 +300,8 @@ function handleLogout() {
   width: 100%;
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: center;
 }
 .nav-links-inner {
   display: flex;
@@ -306,7 +309,6 @@ function handleLogout() {
   height: 36px;
   gap: 0;
   width: 70%;
-  margin: 0 auto;
   overflow-x: auto;
 }
 .nav-link {

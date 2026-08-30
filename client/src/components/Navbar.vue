@@ -161,7 +161,7 @@ function handleLogout() {
 .nav-top {
   position: relative;
   width: 100%;
-  height: 96px;
+  height: 144px;
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
 }
@@ -185,20 +185,20 @@ function handleLogout() {
   z-index: 2;
 }
 .logo-img {
-  width: 48px;
-  height: 48px;
+  width: 72px;
+  height: 72px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 .logo-text { display: flex; flex-direction: column; }
-.logo-name { font-size: 22px; font-weight: 700; color: #e1251b; line-height: 1.2; }
-.logo-slogan { font-size: 10px; color: #999; letter-spacing: 1px; }
+.logo-name { font-size: 30px; font-weight: 700; color: #e1251b; line-height: 1.2; }
+.logo-slogan { font-size: 12px; color: #999; letter-spacing: 1px; }
 
 /* ========== 搜索框 — 水平居中，上半行 ========== */
 .search-wrapper {
   position: absolute;
   left: 50%;
-  top: 30px;
+  top: 36px;
   transform: translate(-50%, -50%);
   width: 30%;
   min-width: 320px;
@@ -308,10 +308,10 @@ function handleLogout() {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 36px;
+  height: 54px;
   display: flex;
   align-items: center;
-  margin: 0 15%;
+  margin: 0 5% 0 25%;
   border-top: 1px solid #f0f0f0;
   overflow-x: auto;
 }

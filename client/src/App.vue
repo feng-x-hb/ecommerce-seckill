@@ -105,7 +105,7 @@ onMounted(() => {
 
 <style scoped>
 .main-content {
-  min-height: calc(100vh - 96px);
+  min-height: calc(100vh - 144px);
 }
 
 /* 全局主题切换按钮 - 可拖拽 */

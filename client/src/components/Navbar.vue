@@ -163,6 +163,7 @@ function handleLogout() {
 
 /* ========== 第一行：白底 header ========== */
 .nav-top {
+  width: 100%;
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
 }
@@ -171,9 +172,8 @@ function handleLogout() {
   align-items: center;
   height: 60px;
   gap: 24px;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0 15%;
+  width: 70%;
+  margin: 0 auto;
 }
 
 /* Logo */
@@ -296,6 +296,7 @@ function handleLogout() {
 
 /* ========== 第二行：导航链接 ========== */
 .nav-links-bar {
+  width: 100%;
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
 }
@@ -304,9 +305,8 @@ function handleLogout() {
   align-items: center;
   height: 36px;
   gap: 0;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0 15%;
+  width: 70%;
+  margin: 0 auto;
   overflow-x: auto;
 }
 .nav-link {

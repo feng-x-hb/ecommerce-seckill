@@ -171,9 +171,9 @@ function handleLogout() {
   align-items: center;
   height: 60px;
   gap: 24px;
-  width: 70%;
-  min-width: 900px;
-  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 15%;
 }
 
 /* Logo */
@@ -304,9 +304,9 @@ function handleLogout() {
   align-items: center;
   height: 36px;
   gap: 0;
-  width: 70%;
-  min-width: 900px;
-  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 15%;
   overflow-x: auto;
 }
 .nav-link {

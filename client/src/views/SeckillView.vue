@@ -218,17 +218,13 @@ onUnmounted(() => { clearInterval(timer) })
 
       <div class="seckill-grid">
         <div v-for="(item, index) in seckillItems" :key="item.seckillItemId" class="seckill-card">
-          <!-- 排名角标 -->
-          <div class="rank-badge" :class="'rank-' + (index + 1)">
-            <el-icon v-if="index === 0"><Trophy /></el-icon>
-            <el-icon v-else-if="index === 1"><Medal /></el-icon>
-            <el-icon v-else><Star /></el-icon>
-            {{ index < 3 ? 'TOP' + (index + 1) : '秒杀' }}
-          </div>
-
-          <!-- 疯抢标签 -->
-          <div class="hot-tag" v-if="getStockPercent(item) >= 60">
-            <span class="hot-dot"></span> 正在疯抢
+          <!-- 卡片粒子 -->
+          <div class="card-particles">
+            <span v-for="n in 6" :key="n" class="card-particle" :style="{
+              left: (n * 16) + '%',
+              animationDelay: (n * 0.5) + 's',
+              animationDuration: (2 + (n % 3)) + 's'
+            }"></span>
           </div>
 
           <!-- 图片区 -->
@@ -241,23 +237,33 @@ onUnmounted(() => { clearInterval(timer) })
                 <circle cx="22" cy="26" r="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
               </svg>
             </div>
-            <!-- 倒计时叠加 -->
-            <div class="img-countdown" v-if="item.activityStatus === 1">
-              <el-icon :size="12"><Clock /></el-icon>
-              {{ countdownDigits.h1 }}{{ countdownDigits.h2 }}:{{ countdownDigits.m1 }}{{ countdownDigits.m2 }}:{{ countdownDigits.s1 }}{{ countdownDigits.s2 }}
+
+            <!-- 排名角标 - 图片顶部居中 -->
+            <div class="rank-badge-center" :class="'rank-' + (index + 1)">
+              <el-icon v-if="index === 0" :size="14"><Trophy /></el-icon>
+              <el-icon v-else-if="index === 1" :size="14"><Medal /></el-icon>
+              <el-icon v-else :size="14"><Star /></el-icon>
+              {{ index < 3 ? 'TOP' + (index + 1) : '秒杀' }}
             </div>
-            <!-- 已抢百分比大圆环 -->
-            <div class="stock-ring-wrap">
-              <svg class="stock-ring" viewBox="0 0 64 64">
-                <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="5" />
-                <circle cx="32" cy="32" r="28" fill="none" :stroke="getStockColor(getStockPercent(item))" stroke-width="5"
-                  stroke-linecap="round" :stroke-dasharray="175.9" :stroke-dashoffset="175.9 * (1 - getStockPercent(item) / 100)"
-                  transform="rotate(-90 32 32)" class="ring-progress" />
+
+            <!-- 已抢圆环 - 图片底部居中 -->
+            <div class="stock-ring-center">
+              <svg class="stock-ring" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="6" />
+                <circle cx="40" cy="40" r="34" fill="none" :stroke="getStockColor(getStockPercent(item))" stroke-width="6"
+                  stroke-linecap="round" :stroke-dasharray="213.6" :stroke-dashoffset="213.6 * (1 - getStockPercent(item) / 100)"
+                  transform="rotate(-90 40 40)" class="ring-progress" />
               </svg>
               <div class="ring-text-wrap">
                 <span class="ring-percent">{{ getStockPercent(item) }}%</span>
                 <span class="ring-label">已抢</span>
               </div>
+            </div>
+
+            <!-- 倒计时叠加 -->
+            <div class="img-countdown" v-if="item.activityStatus === 1">
+              <el-icon :size="14"><Clock /></el-icon>
+              {{ countdownDigits.h1 }}{{ countdownDigits.h2 }}:{{ countdownDigits.m1 }}{{ countdownDigits.m2 }}:{{ countdownDigits.s1 }}{{ countdownDigits.s2 }}
             </div>
           </div>
 
@@ -543,30 +549,54 @@ onUnmounted(() => { clearInterval(timer) })
 }
 .seckill-card:hover { transform: translateY(-6px); box-shadow: 0 12px 32px rgba(225,37,27,0.15), 0 0 0 1px rgba(225,37,27,0.08); }
 
-/* 排名角标 */
-.rank-badge {
-  position: absolute; top: -1px; right: 16px;
-  padding: 5px 14px; border-radius: 0 0 8px 8px;
-  color: #fff; font-size: 12px; font-weight: 600;
-  display: flex; align-items: center; gap: 4px; z-index: 2;
+/* 卡片粒子 */
+.card-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+  border-radius: 12px;
+}
+.card-particle {
+  position: absolute;
+  bottom: -8px;
+  font-size: 10px;
+  animation: cardParticleUp linear infinite;
+  opacity: 0;
+}
+.card-particle::after { content: '🪙'; }
+.card-particle:nth-child(2n)::after { content: '🧧'; }
+.card-particle:nth-child(3n)::after { content: '⚡'; }
+@keyframes cardParticleUp {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  15% { opacity: 0.7; transform: translateY(-20px) scale(1); }
+  85% { opacity: 0.5; }
+  100% { transform: translateY(-200px) scale(0.3); opacity: 0; }
+}
+
+/* 排名角标 - 图片顶部居中 */
+.rank-badge-center {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 20px;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 2;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  letter-spacing: 1px;
 }
 .rank-1 { background: linear-gradient(135deg, #e1251b, #ff4757); }
 .rank-2 { background: linear-gradient(135deg, #ff6700, #ffa502); }
 .rank-3 { background: linear-gradient(135deg, #f5a623, #f0c040); }
-.rank-badge:not(.rank-1):not(.rank-2):not(.rank-3) { background: linear-gradient(135deg, #999, #bbb); }
-
-/* 疯抢标签 */
-.hot-tag {
-  position: absolute; top: 12px; left: 12px; z-index: 2;
-  background: linear-gradient(135deg, #e1251b, #ff4757);
-  color: #fff; font-size: 11px; font-weight: 600;
-  padding: 3px 10px; border-radius: 12px;
-  display: flex; align-items: center; gap: 5px;
-  animation: hotPulse 1.5s ease-in-out infinite;
-}
-.hot-dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; animation: dotBlink 1s ease-in-out infinite; }
-@keyframes hotPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
-@keyframes dotBlink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+.rank-badge-center:not(.rank-1):not(.rank-2):not(.rank-3) { background: linear-gradient(135deg, #999, #bbb); }
 
 /* 图片区 */
 .card-image { position: relative; padding-top: 100%; border-radius: 12px 12px 0 0; overflow: hidden; }
@@ -580,41 +610,46 @@ onUnmounted(() => { clearInterval(timer) })
 .card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .img-countdown {
-  position: absolute; top: 10px; right: 10px;
-  background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
-  color: #fff; font-size: 11px; font-weight: 600;
-  padding: 3px 10px; border-radius: 12px;
+  position: absolute; top: 12px; right: 12px;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  color: #fff; font-size: 13px; font-weight: 700;
+  padding: 4px 12px; border-radius: 12px;
   display: flex; align-items: center; gap: 4px;
   z-index: 1; font-variant-numeric: tabular-nums;
 }
 
-/* 已抢大圆环 */
-.stock-ring-wrap {
-  position: absolute; bottom: 10px; left: 10px;
-  width: 64px; height: 64px; z-index: 1;
+/* 已抢圆环 - 图片底部居中 */
+.stock-ring-center {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  z-index: 2;
 }
-.stock-ring { width: 64px; height: 64px; }
+.stock-ring { width: 80px; height: 80px; }
 .ring-progress { transition: stroke-dashoffset 0.8s ease; }
 .ring-text-wrap {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
 }
-.ring-percent { font-size: 13px; font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); line-height: 1; }
-.ring-label { font-size: 8px; color: rgba(255,255,255,0.8); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.ring-percent { font-size: 16px; font-weight: 900; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.6); line-height: 1; }
+.ring-label { font-size: 9px; color: rgba(255,255,255,0.85); text-shadow: 0 1px 2px rgba(0,0,0,0.5); margin-top: 1px; }
 
 /* 内容区 */
-.card-body { padding: 16px; }
-.product-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; line-height: 1.4; height: 40px; }
-.product-spec { font-size: 12px; color: #999; margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
+.card-body { padding: 18px; }
+.product-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; height: 42px; }
+.product-spec { font-size: 12px; color: #999; margin-bottom: 12px; display: flex; align-items: center; gap: 4px; }
 
 /* 价格 + 限时秒杀标签 */
-.price-section { margin-bottom: 8px; }
+.price-section { margin-bottom: 10px; }
 .price-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .seckill-price { color: #e1251b; display: inline-flex; align-items: baseline; }
-.price-symbol { font-size: 14px; }
-.price-num { font-size: 26px; font-weight: 800; }
-.normal-price { font-size: 13px; color: #bbb; text-decoration: line-through; }
+.price-symbol { font-size: 16px; }
+.price-num { font-size: 32px; font-weight: 900; }
+.normal-price { font-size: 14px; color: #bbb; text-decoration: line-through; }
 
 /* 限时秒杀 2x2 标签 */
 .flash-badge-2x2 {
@@ -623,59 +658,60 @@ onUnmounted(() => { clearInterval(timer) })
   gap: 0;
   background: linear-gradient(135deg, #e1251b, #ff4757);
   color: #fff;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 900;
-  line-height: 1.1;
-  padding: 3px 5px;
-  border-radius: 4px;
+  line-height: 1.15;
+  padding: 4px 6px;
+  border-radius: 5px;
   text-align: center;
   letter-spacing: 2px;
-  box-shadow: 0 2px 8px rgba(225,37,27,0.4);
+  box-shadow: 0 2px 10px rgba(225,37,27,0.5);
   animation: flashBadgePulse 1.5s ease-in-out infinite;
 }
 @keyframes flashBadgePulse {
-  0%, 100% { box-shadow: 0 2px 8px rgba(225,37,27,0.4); transform: scale(1); }
-  50% { box-shadow: 0 2px 14px rgba(225,37,27,0.7); transform: scale(1.05); }
+  0%, 100% { box-shadow: 0 2px 10px rgba(225,37,27,0.5); transform: scale(1); }
+  50% { box-shadow: 0 3px 18px rgba(225,37,27,0.8); transform: scale(1.06); }
 }
 
 .discount-tag {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 11px; color: #ff6700;
-  background: #fff0f0; padding: 3px 10px;
-  border-radius: 999px; margin-top: 4px;
-  border: 1px solid #ffe0d0;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 13px; font-weight: 600; color: #fff;
+  background: linear-gradient(135deg, #ff6700, #e1251b);
+  padding: 4px 12px;
+  border-radius: 999px; margin-top: 6px;
+  box-shadow: 0 2px 8px rgba(225,37,27,0.3);
 }
 
 .meta-row {
   display: flex; justify-content: space-between; align-items: center;
-  font-size: 11px; color: #999; margin-bottom: 12px;
+  font-size: 13px; color: #666; margin-bottom: 14px;
 }
-.limit-info, .viewer-info { display: flex; align-items: center; gap: 3px; }
+.limit-info, .viewer-info { display: flex; align-items: center; gap: 4px; }
 
 /* 抢购按钮 */
 .buy-btn {
-  width: 100%; height: 42px;
-  border: none; border-radius: 8px;
-  font-size: 15px; font-weight: 700;
-  letter-spacing: 1px; cursor: pointer;
+  width: 100%; height: 48px;
+  border: none; border-radius: 10px;
+  font-size: 17px; font-weight: 800;
+  letter-spacing: 2px; cursor: pointer;
   position: relative; overflow: hidden;
   transition: transform 0.2s, box-shadow 0.3s;
 }
 .btn-active {
   background: linear-gradient(135deg, #e1251b, #ff4757);
-  color: #fff; box-shadow: 0 4px 16px rgba(225,37,27,0.3);
-  animation: btnPulse 2s ease-in-out infinite;
+  color: #fff; box-shadow: 0 4px 18px rgba(225,37,27,0.4);
+  animation: btnPulse 1.5s ease-in-out infinite;
 }
-.btn-active:hover { transform: scale(1.02); box-shadow: 0 6px 24px rgba(225,37,27,0.4); }
+.btn-active:hover { transform: scale(1.03); box-shadow: 0 6px 28px rgba(225,37,27,0.5); }
 .btn-active::after {
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
   transform: translateX(-100%);
-  animation: btnShine 3s ease-in-out infinite;
+  animation: btnShine 2.5s ease-in-out infinite;
 }
 .btn-disabled { background: #e0e0e0; color: #999; cursor: not-allowed; }
 .btn-text { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; }
-@keyframes btnPulse { 0%,100%{box-shadow:0 4px 16px rgba(225,37,27,0.3);} 50%{box-shadow:0 4px 24px rgba(225,37,27,0.5);} }
+@keyframes btnPulse { 0%,100%{box-shadow:0 4px 18px rgba(225,37,27,0.4);} 50%{box-shadow:0 4px 28px rgba(225,37,27,0.6);} }
 @keyframes btnShine { 0%,70%,100%{transform:translateX(-100%);} 80%{transform:translateX(100%);} }
 
 .recent-orders { margin-top: 10px; font-size: 11px; color: #999; display: flex; align-items: center; gap: 5px; }

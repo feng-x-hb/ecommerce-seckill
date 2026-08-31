@@ -40,8 +40,14 @@ request.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
+      localStorage.removeItem('user')
       router.push('/login')
       ElMessage.error('请先登录')
+    } else if (error.response?.data?.message === '用户不存在') {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      router.push('/login')
+      ElMessage.error('账号异常，请重新登录')
     } else {
       ElMessage.error(error.response?.data?.message || '网络异常')
     }

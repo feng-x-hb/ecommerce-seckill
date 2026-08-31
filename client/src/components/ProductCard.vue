@@ -58,12 +58,13 @@ function onMouseLeave() {
     @mouseleave="onMouseLeave"
   >
     <div class="card-image">
-      <img v-if="image && !image.startsWith('/images/products/')" :src="image" :alt="title" class="product-img" loading="lazy" @error="($event.target as HTMLImageElement).style.display='none'" />
+      <img v-if="image" :src="image" :alt="title" class="product-img" loading="lazy" @error="($event.target as HTMLImageElement).style.display='none'" />
       <div class="placeholder-img" :style="{ background: `linear-gradient(135deg, hsl(${id * 47 % 360}, 55%, 88%), hsl(${id * 47 % 360 + 30}, 55%, 80%))` }">
-        <div class="placeholder-content">
-          <div class="placeholder-icon">{{ title.charAt(0) }}</div>
-          <div class="placeholder-title">{{ title.length > 8 ? title.slice(0, 8) : title }}</div>
-        </div>
+        <svg class="placeholder-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="16" width="40" height="32" rx="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+          <path d="M16 40 L24 30 L30 36 L42 22 L48 30" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+          <circle cx="22" cy="26" r="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+        </svg>
       </div>
 
       <div class="hover-overlay">
@@ -155,34 +156,6 @@ function onMouseLeave() {
   width: 56px;
   height: 56px;
   color: rgba(255,255,255,0.6);
-}
-.placeholder-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-.placeholder-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.9);
-  backdrop-filter: blur(4px);
-}
-.placeholder-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.85);
-  text-align: center;
-  max-width: 80%;
-  line-height: 1.3;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 /* 悬浮遮罩 */

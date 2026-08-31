@@ -15,6 +15,28 @@ const activityId = 1
 const now = ref(Date.now())
 let timer: ReturnType<typeof setInterval>
 
+// ========== 随机倒计时（1s ~ 3min） ==========
+const randomCountdown = ref(Math.floor(Math.random() * 179 + 1))
+let countdownTimer: ReturnType<typeof setInterval>
+
+function startRandomCountdown() {
+  randomCountdown.value = Math.floor(Math.random() * 179 + 1)
+  clearInterval(countdownTimer)
+  countdownTimer = setInterval(() => {
+    randomCountdown.value--
+    if (randomCountdown.value <= 0) {
+      startRandomCountdown()
+    }
+  }, 1000)
+}
+
+const randomCountdownDigits = computed(() => {
+  const total = Math.max(0, randomCountdown.value)
+  const m = Math.floor(total / 60)
+  const s = total % 60
+  return { m: String(m).padStart(2, '0'), s: String(s).padStart(2, '0') }
+})
+
 // ========== 价格动画（每次进入重新播放） ==========
 const animatedPrices = ref<Record<number, number>>({})
 const priceRefs = ref<HTMLElement[]>([])
@@ -136,9 +158,11 @@ async function handleBuy(item: any) {
 onMounted(() => {
   fetchSeckill()
   timer = setInterval(() => { now.value = Date.now() }, 1000)
+  startRandomCountdown()
 })
 onUnmounted(() => {
   clearInterval(timer)
+  clearInterval(countdownTimer)
   observers.value.forEach(o => o.disconnect())
 })
 </script>
@@ -213,11 +237,11 @@ onUnmounted(() => {
           <!-- 图片区 - 深色底 + 放射线 + 发光边框 -->
           <div class="card-image">
             <div class="card-dark-bg">
-              <!-- 放射线 -->
-              <div class="radial-lines"></div>
               <!-- 产品图 -->
               <div class="product-glow-wrap">
                 <div class="product-img-box">
+                  <!-- 放射线叠加在图片上 -->
+                  <div class="radial-lines"></div>
                   <img v-if="item.productImage" :src="item.productImage" :alt="item.productName" class="card-img" @error="($event.target as HTMLImageElement).style.display='none'" />
                   <svg v-else class="placeholder-svg" viewBox="0 0 64 64" fill="none">
                     <rect x="12" y="16" width="40" height="32" rx="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
@@ -250,10 +274,10 @@ onUnmounted(() => {
               <!-- 左右装饰 -->
               <span class="deco-left">🔥</span>
               <span class="deco-right">⚡</span>
-              <!-- 角标 -->
+              <!-- 角标 - 随机倒计时 -->
               <div class="img-top-right" v-if="item.activityStatus === 1">
-                <el-icon :size="12"><Clock /></el-icon>
-                {{ countdownDigits.h1 }}{{ countdownDigits.h2 }}:{{ countdownDigits.m1 }}{{ countdownDigits.m2 }}:{{ countdownDigits.s1 }}{{ countdownDigits.s2 }}
+                <el-icon :size="14"><Clock /></el-icon>
+                {{ randomCountdownDigits.m }}:{{ randomCountdownDigits.s }}
               </div>
             </div>
           </div>
@@ -413,15 +437,19 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-/* 放射线 */
+/* 放射线 - 叠加在图片上 */
 .radial-lines {
-  position: absolute; inset: 0;
+  position: absolute; inset: -50%;
+  width: 200%; height: 200%;
   background: repeating-conic-gradient(
     from 0deg,
     transparent 0deg 8deg,
-    rgba(255,30,0,0.15) 8deg 10deg
+    rgba(255,30,0,0.18) 8deg 10deg
   );
   animation: radialSpin 30s linear infinite;
+  z-index: 2;
+  pointer-events: none;
+  mix-blend-mode: screen;
 }
 @keyframes radialSpin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
 
@@ -429,7 +457,7 @@ onUnmounted(() => {
 .product-glow-wrap {
   position: relative; z-index: 2;
   padding: 6px;
-  width: 88%;
+  width: 96%;
   border-radius: 16px;
   background: linear-gradient(135deg, #ff2d00, #ff6700, #ff2d00);
   box-shadow: 0 0 30px rgba(255,45,0,0.6), 0 0 60px rgba(255,45,0,0.3);
@@ -494,12 +522,14 @@ onUnmounted(() => {
 
 /* 右上角倒计时 */
 .img-top-right {
-  position: absolute; top: 10px; right: 10px; z-index: 3;
-  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
-  color: #fff; font-size: 12px; font-weight: 700;
-  padding: 4px 10px; border-radius: 10px;
-  display: flex; align-items: center; gap: 4px;
+  position: absolute; top: 12px; right: 12px; z-index: 3;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+  color: #fff; font-size: 16px; font-weight: 900;
+  padding: 6px 14px; border-radius: 10px;
+  display: flex; align-items: center; gap: 5px;
   font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  letter-spacing: 1px;
 }
 
 /* ==================== 内容区 ==================== */

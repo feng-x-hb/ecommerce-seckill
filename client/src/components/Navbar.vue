@@ -119,7 +119,7 @@ function handleLogout() {
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item disabled>
-                  <span style="color:#999;font-size:12px">登录账号：{{ userStore.userInfo.nickname }}</span>
+                  <span style="color:#999;font-size:12px">登录账号：{{ userStore.userInfo.username }}</span>
                 </el-dropdown-item>
                 <el-dropdown-item divided command="info"><el-icon><Edit /></el-icon> 个人中心</el-dropdown-item>
                 <el-dropdown-item command="favorites"><el-icon><Star /></el-icon> 我的收藏</el-dropdown-item>

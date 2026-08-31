@@ -7,6 +7,7 @@ import com.example.mall.dto.LoginDTO;
 import com.example.mall.dto.LoginVO;
 import com.example.mall.dto.ResetPasswordDTO;
 import com.example.mall.dto.ProfileDTO;
+import com.example.mall.dto.ChangeCredentialDTO;
 import com.example.mall.entity.User;
 import com.example.mall.mapper.UserMapper;
 import com.example.mall.service.AuthService;
@@ -194,16 +195,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException("用户不存在");
         }
         if (profileDTO.getNickname() != null && !profileDTO.getNickname().isBlank()) {
-            String newNickname = profileDTO.getNickname().trim();
-            if (!newNickname.equals(user.getNickname())) {
-                Long count = userMapper.selectCount(
-                        new LambdaQueryWrapper<User>()
-                                .eq(User::getNickname, newNickname));
-                if (count > 0) {
-                    throw new BusinessException("该昵称已被使用");
-                }
-            }
-            user.setNickname(newNickname);
+            user.setNickname(profileDTO.getNickname().trim());
         }
         if (profileDTO.getAvatar() != null) {
             user.setAvatar(profileDTO.getAvatar());
@@ -211,6 +203,48 @@ public class AuthServiceImpl implements AuthService {
         if (profileDTO.getSignature() != null) {
             user.setSignature(profileDTO.getSignature());
         }
+        userMapper.updateById(user);
+    }
+
+    @Override
+    @Transactional
+    public void changeCredential(Long userId, ChangeCredentialDTO dto) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        // 验证旧密码
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new BusinessException("当前密码错误");
+        }
+
+        // 至少要改一个
+        boolean changeUsername = dto.getNewUsername() != null && !dto.getNewUsername().isBlank();
+        boolean changePassword = dto.getNewPassword() != null && !dto.getNewPassword().isBlank();
+        if (!changeUsername && !changePassword) {
+            throw new BusinessException("请填写新账号或新密码");
+        }
+
+        // 修改账号：检查唯一性
+        if (changeUsername) {
+            String newUsername = dto.getNewUsername().trim();
+            if (!newUsername.equals(user.getUsername())) {
+                Long count = userMapper.selectCount(
+                        new LambdaQueryWrapper<User>()
+                                .eq(User::getUsername, newUsername));
+                if (count > 0) {
+                    throw new BusinessException("该账号已被使用");
+                }
+                user.setUsername(newUsername);
+            }
+        }
+
+        // 修改密码
+        if (changePassword) {
+            user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        }
+
         userMapper.updateById(user);
     }
 }

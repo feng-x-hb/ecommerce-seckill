@@ -6,6 +6,7 @@ import com.example.mall.dto.LoginVO;
 import com.example.mall.dto.RegisterDTO;
 import com.example.mall.dto.ResetPasswordDTO;
 import com.example.mall.dto.ProfileDTO;
+import com.example.mall.dto.ChangeCredentialDTO;
 import com.example.mall.service.AuthService;
 import com.example.mall.vo.UserInfoVO;
 import jakarta.validation.Valid;
@@ -91,6 +92,17 @@ public class AuthController {
     public Result<Void> updateProfile(@RequestAttribute("userId") Long userId,
                                       @RequestBody ProfileDTO profileDTO) {
         authService.updateProfile(userId, profileDTO);
+        return Result.success(null);
+    }
+
+    /**
+     * 修改账号名或密码：PUT /api/auth/credential
+     * 需要登录，必须验证旧密码。
+     */
+    @PutMapping("/credential")
+    public Result<Void> changeCredential(@RequestAttribute("userId") Long userId,
+                                         @Valid @RequestBody ChangeCredentialDTO dto) {
+        authService.changeCredential(userId, dto);
         return Result.success(null);
     }
 }

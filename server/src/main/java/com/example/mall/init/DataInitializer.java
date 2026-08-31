@@ -41,19 +41,24 @@ public class DataInitializer implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // 固定 ID 映射，与 data-products.sql 中的 seller_id 保持一致
+    private static final long BUYER_ID  = 10001L;
+    private static final long SELLER_ID = 10002L;
+    private static final long ADMIN_ID  = 10003L;
+
     @Override
     public void run(String... args) {
-        // 三个演示账号的定义：用户名 / 角色 / 昵称
-        insertIfAbsent("buyer001",  0, "演示买家");
-        insertIfAbsent("seller001", 1, "演示商家");
-        insertIfAbsent("admin001",  2, "演示管理员");
+        // 三个演示账号的定义：用户名 / 角色 / 昵称 / 固定ID
+        insertIfAbsent("buyer001",  0, "演示买家",  BUYER_ID);
+        insertIfAbsent("seller001", 1, "演示商家",  SELLER_ID);
+        insertIfAbsent("admin001",  2, "演示管理员", ADMIN_ID);
     }
 
     /**
      * 如果指定用户名的账号不存在，就创建一个（密码统一 123456，BCrypt 加密）。
      * 已存在则什么都不做——这就是"幂等"，保证重启不会重复建、不会清数据。
      */
-    private void insertIfAbsent(String username, int role, String nickname) {
+    private void insertIfAbsent(String username, int role, String nickname, long explicitId) {
         Long count = userMapper.selectCount(
                 new LambdaQueryWrapper<User>().eq(User::getUsername, username));
         if (count != null && count > 0) {
@@ -64,6 +69,7 @@ public class DataInitializer implements CommandLineRunner {
         String phone = "138" + String.format("%02d", role) + String.format("%06d", System.nanoTime() % 1000000);
 
         User user = new User();
+        user.setId(explicitId);
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode("123456"));
         user.setPhone(phone);

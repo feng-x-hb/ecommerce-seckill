@@ -12,7 +12,7 @@ import request from '@/api/request'
 
 export interface UserInfo {
   id: number
-  account: string
+  username: string
   nickname: string
   avatar: string
   signature: string
@@ -35,7 +35,7 @@ export const useUserStore = defineStore('user', () => {
     token.value = res.data.token
     localStorage.setItem('token', res.data.token)
     // 登录返回的基本信息也存起来
-    const basicInfo = { id: res.data.userId, nickname: res.data.nickname, role: res.data.role }
+    const basicInfo = { id: res.data.userId, username: res.data.username, nickname: res.data.nickname, role: res.data.role }
     userInfo.value = basicInfo as UserInfo
     localStorage.setItem('user', JSON.stringify(basicInfo))
   }

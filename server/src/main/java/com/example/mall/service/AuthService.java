@@ -5,6 +5,7 @@ import com.example.mall.dto.LoginDTO;
 import com.example.mall.dto.LoginVO;
 import com.example.mall.dto.ResetPasswordDTO;
 import com.example.mall.dto.ProfileDTO;
+import com.example.mall.dto.ChangeCredentialDTO;
 import com.example.mall.vo.UserInfoVO;
 
 /**
@@ -54,4 +55,12 @@ public interface AuthService {
      * @param profileDTO 更新字段（昵称/头像/签名）
      */
     void updateProfile(Long userId, ProfileDTO profileDTO);
+
+    /**
+     * 修改账号名或密码（需验证旧密码）
+     *
+     * @param userId 当前用户 id
+     * @param dto    修改参数（旧密码 + 新账号/新密码，至少填一个）
+     */
+    void changeCredential(Long userId, ChangeCredentialDTO dto);
 }

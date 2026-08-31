@@ -283,3 +283,8 @@ UPDATE product SET category_id=(SELECT id FROM (SELECT id FROM category WHERE na
 SET @col_exists = (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'signature');
 SET @sql = IF(@col_exists = 0, 'ALTER TABLE user ADD COLUMN signature VARCHAR(200) DEFAULT NULL', 'SELECT 1');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- ========== 迁移：设置 user 表自增起始值为 10001 ==========
+SET @ai_exists = (SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user');
+SET @sql2 = IF(@ai_exists < 10001, 'ALTER TABLE user AUTO_INCREMENT = 10001', 'SELECT 1');
+PREPARE stmt2 FROM @sql2; EXECUTE stmt2; DEALLOCATE PREPARE stmt2;

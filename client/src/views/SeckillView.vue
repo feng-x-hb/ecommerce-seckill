@@ -224,6 +224,21 @@ onUnmounted(() => {
                     <path d="M16 40 L24 30 L30 36 L42 22 L48 30" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
                     <circle cx="22" cy="26" r="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
                   </svg>
+                  <!-- 热抢中圆环 - 图片内底部居中 -->
+                  <div class="hot-ring">
+                    <svg class="hot-ring-svg" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,100,0,0.2)" stroke-width="4" />
+                      <circle cx="50" cy="50" r="44" fill="none" stroke="#ff4500" stroke-width="4"
+                        stroke-linecap="round" stroke-dasharray="276.5"
+                        :stroke-dashoffset="276.5 * (1 - getStockPercent(item) / 100)"
+                        transform="rotate(-90 50 50)" class="hot-ring-progress" />
+                    </svg>
+                    <div class="hot-ring-inner">
+                      <span class="hot-ring-icon">🔥</span>
+                      <span class="hot-ring-text">热抢中</span>
+                      <span class="hot-ring-count">{{ getViewersCount(item.skuId) }}人参与</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <!-- 限时秒杀大标题 -->
@@ -231,21 +246,6 @@ onUnmounted(() => {
                 <span class="img-lightning">⚡</span>
                 <span class="img-title-text">限时秒杀</span>
                 <span class="img-lightning">⚡</span>
-              </div>
-              <!-- 热抢中圆环 -->
-              <div class="hot-ring">
-                <svg class="hot-ring-svg" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,100,0,0.2)" stroke-width="4" />
-                  <circle cx="50" cy="50" r="44" fill="none" stroke="#ff4500" stroke-width="4"
-                    stroke-linecap="round" stroke-dasharray="276.5"
-                    :stroke-dashoffset="276.5 * (1 - getStockPercent(item) / 100)"
-                    transform="rotate(-90 50 50)" class="hot-ring-progress" />
-                </svg>
-                <div class="hot-ring-inner">
-                  <span class="hot-ring-icon">🔥</span>
-                  <span class="hot-ring-text">热抢中</span>
-                  <span class="hot-ring-count">{{ getViewersCount(item.skuId) }}人参与</span>
-                </div>
               </div>
               <!-- 左右装饰 -->
               <span class="deco-left">🔥</span>
@@ -428,7 +428,8 @@ onUnmounted(() => {
 /* 产品图发光框 */
 .product-glow-wrap {
   position: relative; z-index: 2;
-  padding: 8px;
+  padding: 6px;
+  width: 88%;
   border-radius: 16px;
   background: linear-gradient(135deg, #ff2d00, #ff6700, #ff2d00);
   box-shadow: 0 0 30px rgba(255,45,0,0.6), 0 0 60px rgba(255,45,0,0.3);
@@ -439,11 +440,12 @@ onUnmounted(() => {
   50%{box-shadow:0 0 40px rgba(255,45,0,0.8),0 0 80px rgba(255,45,0,0.5);}
 }
 .product-img-box {
-  width: 180px; height: 180px;
+  width: 100%; aspect-ratio: 1/1;
   border-radius: 12px;
   overflow: hidden;
   background: #2a2030;
   display: flex; align-items: center; justify-content: center;
+  position: relative;
 }
 .card-img { width: 100%; height: 100%; object-fit: cover; }
 .placeholder-svg { width: 56px; height: 56px; color: rgba(255,255,255,0.4); }
@@ -461,13 +463,16 @@ onUnmounted(() => {
   letter-spacing: 4px;
 }
 
-/* 热抢中圆环 */
+/* 热抢中圆环 - 在图片内底部居中 */
 .hot-ring {
-  position: relative; z-index: 2;
-  width: 90px; height: 90px;
-  margin-top: 12px;
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px; height: 80px;
+  z-index: 3;
 }
-.hot-ring-svg { width: 90px; height: 90px; }
+.hot-ring-svg { width: 80px; height: 80px; }
 .hot-ring-progress { transition: stroke-dashoffset 0.8s ease; filter: drop-shadow(0 0 6px rgba(255,69,0,0.6)); }
 .hot-ring-inner {
   position: absolute; inset: 0;

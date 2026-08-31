@@ -1,17 +1,42 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onUpdated, nextTick, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import request from '@/api/request'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 const searchKeyword = ref('')
 const isSearchFocused = ref(false)
 const searchHistory = ref<string[]>([])
 const showHistory = ref(false)
 const searchSuggestions = ref<string[]>([])
+
+// 滑动背景指示器
+const navLinksRef = ref<HTMLElement | null>(null)
+const indicatorStyle = ref({ left: '0px', width: '0px', opacity: 0 })
+
+function updateIndicator() {
+  nextTick(() => {
+    const container = navLinksRef.value
+    if (!container) return
+    const activeEl = container.querySelector('.nav-link-active') as HTMLElement
+    if (!activeEl) { indicatorStyle.value.opacity = 0; return }
+    const containerRect = container.getBoundingClientRect()
+    const activeRect = activeEl.getBoundingClientRect()
+    indicatorStyle.value = {
+      left: (activeRect.left - containerRect.left + container.scrollLeft) + 'px',
+      width: activeRect.width + 'px',
+      opacity: 1
+    }
+  })
+}
+
+watch(() => route.path, () => { updateIndicator() }, { immediate: true })
+onMounted(() => { updateIndicator() })
+onUpdated(() => { updateIndicator() })
 
 onMounted(() => {
   const saved = localStorage.getItem('searchHistory')
@@ -136,18 +161,20 @@ function handleLogout() {
         </div>
 
         <!-- 导航链接 — 下半行 15%~85% -->
-        <div class="nav-links-row">
-          <router-link to="/" class="nav-link"><el-icon :size="14"><HomeFilled /></el-icon> 首页</router-link>
-          <router-link to="/seckill" class="nav-link seckill-link"><el-icon :size="14"><Lightning /></el-icon> 秒杀</router-link>
-          <router-link to="/category/1" class="nav-link">数码家电</router-link>
-          <router-link to="/category/2" class="nav-link">服饰鞋包</router-link>
-          <router-link to="/category/3" class="nav-link">家居日用</router-link>
-          <router-link to="/category/4" class="nav-link">食品饮料</router-link>
-          <router-link to="/category/5" class="nav-link">美妆个护</router-link>
-          <router-link to="/category/6" class="nav-link">运动户外</router-link>
-          <router-link to="/category/7" class="nav-link">母婴玩具</router-link>
-          <router-link to="/orders" class="nav-link">我的订单</router-link>
-          <router-link to="/coupons" class="nav-link">领券中心</router-link>
+        <div class="nav-links-row" ref="navLinksRef">
+          <!-- 滑动背景指示器 -->
+          <div class="nav-indicator" :style="indicatorStyle"></div>
+          <router-link to="/" class="nav-link" :class="{ 'nav-link-active': route.path === '/' }"><el-icon :size="14"><HomeFilled /></el-icon> 首页</router-link>
+          <router-link to="/seckill" class="nav-link seckill-link" :class="{ 'nav-link-active': route.path === '/seckill' }"><el-icon :size="14"><Lightning /></el-icon> 秒杀</router-link>
+          <router-link to="/category/1" class="nav-link" :class="{ 'nav-link-active': route.path === '/category/1' }">数码家电</router-link>
+          <router-link to="/category/2" class="nav-link" :class="{ 'nav-link-active': route.path === '/category/2' }">服饰鞋包</router-link>
+          <router-link to="/category/3" class="nav-link" :class="{ 'nav-link-active': route.path === '/category/3' }">家居日用</router-link>
+          <router-link to="/category/4" class="nav-link" :class="{ 'nav-link-active': route.path === '/category/4' }">食品饮料</router-link>
+          <router-link to="/category/5" class="nav-link" :class="{ 'nav-link-active': route.path === '/category/5' }">美妆个护</router-link>
+          <router-link to="/category/6" class="nav-link" :class="{ 'nav-link-active': route.path === '/category/6' }">运动户外</router-link>
+          <router-link to="/category/7" class="nav-link" :class="{ 'nav-link-active': route.path === '/category/7' }">母婴玩具</router-link>
+          <router-link to="/orders" class="nav-link" :class="{ 'nav-link-active': route.path === '/orders' }">我的订单</router-link>
+          <router-link to="/coupons" class="nav-link" :class="{ 'nav-link-active': route.path === '/coupons' }">领券中心</router-link>
         </div>
       </div>
     </div>
@@ -316,8 +343,21 @@ function handleLogout() {
   margin: 0 5% 0 25%;
   border-top: 1px solid var(--jd-border-light, #f0f0f0);
   overflow-x: auto;
+  overflow-y: hidden;
+}
+.nav-indicator {
+  position: absolute;
+  bottom: 6px;
+  height: 32px;
+  background: linear-gradient(135deg, #ff6700, #e1251b);
+  border-radius: 16px;
+  transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s;
+  z-index: 0;
+  pointer-events: none;
 }
 .nav-link {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -326,10 +366,11 @@ function handleLogout() {
   text-decoration: none;
   font-size: 13px;
   white-space: nowrap;
-  transition: color 0.2s, transform 0.25s ease;
+  transition: color 0.25s;
   border-radius: 4px;
 }
-.nav-link:hover { color: #e1251b !important; background: rgba(225,37,27,0.08); transform: scale(1.08); }
-.nav-link.router-link-exact-active { color: #e1251b !important; font-weight: 600; }
+.nav-link:hover { color: #fff !important; }
+.nav-link-active { color: #fff !important; font-weight: 600; }
 .seckill-link { color: #e1251b !important; font-weight: 600; }
+.seckill-link.nav-link-active { color: #fff !important; }
 </style>

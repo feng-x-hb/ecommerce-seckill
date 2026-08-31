@@ -5,7 +5,7 @@
  * 功能：买家/商家可编辑昵称、头像、个性签名；管理员不可访问
  * 只读字段：商家显示手机号（只读）
  */
-import { ref, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import request from '@/api/request'

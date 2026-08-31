@@ -194,7 +194,8 @@ onUnmounted(() => { clearInterval(timer) })
           <!-- 图片区 -->
           <div class="card-image">
             <div class="placeholder-img" :style="{ background: `linear-gradient(135deg, hsl(${item.skuId * 47 % 360}, 55%, 88%), hsl(${item.skuId * 47 % 360 + 30}, 55%, 80%))` }">
-              <svg class="placeholder-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <img v-if="item.productImage" :src="item.productImage" :alt="item.productName" class="card-img" @error="($event.target as HTMLImageElement).style.display='none'" />
+              <svg v-if="!item.productImage" class="placeholder-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="12" y="16" width="40" height="32" rx="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
                 <path d="M16 40 L24 30 L30 36 L42 22 L48 30" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
                 <circle cx="22" cy="26" r="4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
@@ -594,6 +595,13 @@ onUnmounted(() => { clearInterval(timer) })
 }
 .seckill-card:hover .placeholder-img { transform: scale(1.06); }
 .placeholder-svg { width: 56px; height: 56px; color: rgba(255,255,255,0.6); }
+.card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 /* 图片倒计时叠加 */
 .img-countdown {

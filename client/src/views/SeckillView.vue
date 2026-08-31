@@ -238,12 +238,10 @@ onUnmounted(() => { clearInterval(timer) })
               </svg>
             </div>
 
-            <!-- 排名角标 - 图片顶部居中 -->
-            <div class="rank-badge-center" :class="'rank-' + (index + 1)">
-              <el-icon v-if="index === 0" :size="14"><Trophy /></el-icon>
-              <el-icon v-else-if="index === 1" :size="14"><Medal /></el-icon>
-              <el-icon v-else :size="14"><Star /></el-icon>
-              {{ index < 3 ? 'TOP' + (index + 1) : '秒杀' }}
+            <!-- 排名角标 - 图片左上 -->
+            <div class="rank-corner" :class="'rank-' + (index + 1)" v-if="index < 3">
+              <el-icon :size="12"><Trophy /></el-icon>
+              TOP{{ index + 1 }}
             </div>
 
             <!-- 已抢圆环 - 图片底部居中 -->
@@ -269,10 +267,19 @@ onUnmounted(() => { clearInterval(timer) })
 
           <!-- 内容区 -->
           <div class="card-body" :ref="(el: any) => { if (el) priceRefs[index] = el }">
+            <!-- 第一标签：限时秒杀 -->
+            <div class="top-badge">
+              <span class="top-badge-inner">
+                <el-icon :size="14"><Lightning /></el-icon>
+                限时秒杀
+              </span>
+            </div>
+
+            <!-- 商品名 -->
             <div class="product-name ellipsis-2">{{ item.productName }}</div>
             <div class="product-spec"><el-icon><Tag /></el-icon> {{ item.specs }}</div>
 
-            <!-- 价格 + 限时秒杀标签 -->
+            <!-- 价格区 - 最大最醒目 -->
             <div class="price-section">
               <div class="price-row">
                 <span class="seckill-price">
@@ -280,20 +287,37 @@ onUnmounted(() => { clearInterval(timer) })
                   <span class="price-num">{{ (animatedPrices[item.seckillItemId] || item.normalPrice).toFixed(0) }}</span>
                 </span>
                 <span class="normal-price">¥{{ item.normalPrice }}</span>
-                <div class="flash-badge-2x2">
-                  <span>限时</span><span>秒杀</span>
-                </div>
               </div>
-              <div class="discount-tag">
-                <el-icon><Discount /></el-icon>
-                已省 ¥{{ (item.normalPrice - item.seckillPrice).toFixed(0) }}
+              <!-- 直降标签 -->
+              <div class="save-tags">
+                <span class="save-tag-main">
+                  <el-icon><Discount /></el-icon>
+                  直降 ¥{{ (item.normalPrice - item.seckillPrice).toFixed(0) }}
+                </span>
+                <span class="save-tag-sub">限时立减</span>
               </div>
             </div>
 
-            <!-- 限购 + 人气 -->
-            <div class="meta-row">
-              <span class="limit-info"><el-icon><Warning /></el-icon> 限购{{ item.purchaseLimit }}件 · 剩{{ item.seckillStock }}件</span>
-              <span class="viewer-info"><el-icon><View /></el-icon> {{ getViewersCount(item.skuId) }}人围观</span>
+            <!-- 紧迫感组件 -->
+            <div class="urgency-section">
+              <div class="stock-bar">
+                <div class="stock-bar-fill" :style="{ width: getStockPercent(item) + '%', background: getStockColor(getStockPercent(item)) }"></div>
+              </div>
+              <div class="urgency-row">
+                <span class="urgency-stock">
+                  <el-icon><Warning /></el-icon>
+                  仅剩 <strong>{{ item.seckillStock }}</strong> 件
+                </span>
+                <span class="urgency-hot">
+                  <el-icon><View /></el-icon>
+                  已有 <strong>{{ getViewersCount(item.skuId) }}</strong> 人抢购
+                </span>
+              </div>
+            </div>
+
+            <!-- 限购 -->
+            <div class="limit-row">
+              <el-icon><Warning /></el-icon> 限购 {{ item.purchaseLimit }} 件
             </div>
 
             <!-- 抢购按钮 -->
@@ -301,19 +325,16 @@ onUnmounted(() => { clearInterval(timer) })
               'btn-active': item.seckillStock > 0 && item.activityStatus === 1,
               'btn-disabled': item.seckillStock <= 0 || item.activityStatus !== 1
             }" @click="handleBuy(item)">
+              <span class="btn-glow"></span>
               <span class="btn-text" v-if="item.seckillStock > 0 && item.activityStatus === 1">
-                <el-icon><Lightning /></el-icon> 立即抢购
+                <el-icon :size="18"><Lightning /></el-icon> 立即抢购
+                <el-icon :size="16" class="btn-arrow"><Right /></el-icon>
               </span>
               <span class="btn-text" v-else-if="item.seckillStock <= 0">
                 <el-icon><CircleClose /></el-icon> 已抢完
               </span>
               <span class="btn-text" v-else>未开始</span>
             </button>
-
-            <div class="recent-orders" v-if="item.activityStatus === 1">
-              <span class="recent-dot"></span>
-              刚刚有{{ getRecentOrders(item.skuId) }}人抢购成功
-            </div>
           </div>
         </div>
       </div>
@@ -575,23 +596,13 @@ onUnmounted(() => { clearInterval(timer) })
   100% { transform: translateY(-200px) scale(0.3); opacity: 0; }
 }
 
-/* 排名角标 - 图片顶部居中 */
-.rank-badge-center {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 6px 20px;
-  border-radius: 20px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  z-index: 2;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
-  letter-spacing: 1px;
+/* 排名角标 - 图片左上 */
+.rank-corner {
+  position: absolute; top: 10px; left: 10px;
+  padding: 4px 12px; border-radius: 6px;
+  color: #fff; font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; gap: 3px; z-index: 2;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .rank-1 { background: linear-gradient(135deg, #e1251b, #ff4757); }
 .rank-2 { background: linear-gradient(135deg, #ff6700, #ffa502); }
@@ -640,82 +651,118 @@ onUnmounted(() => { clearInterval(timer) })
 
 /* 内容区 */
 .card-body { padding: 18px; }
-.product-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; height: 42px; }
-.product-spec { font-size: 12px; color: #999; margin-bottom: 12px; display: flex; align-items: center; gap: 4px; }
 
-/* 价格 + 限时秒杀标签 */
+/* 第一标签：限时秒杀 */
+.top-badge { margin-bottom: 8px; }
+.top-badge-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #e1251b, #ff2d2d);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+  padding: 5px 14px;
+  border-radius: 6px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 10px rgba(225,37,27,0.5);
+  text-shadow: 0 0 8px rgba(255,215,0,0.4);
+  border: 1px solid rgba(255,215,0,0.3);
+  animation: topBadgeGlow 2s ease-in-out infinite;
+}
+@keyframes topBadgeGlow {
+  0%,100% { box-shadow: 0 2px 10px rgba(225,37,27,0.5); border-color: rgba(255,215,0,0.3); }
+  50% { box-shadow: 0 2px 18px rgba(225,37,27,0.7), 0 0 12px rgba(255,215,0,0.3); border-color: rgba(255,215,0,0.6); }
+}
+
+.product-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; line-height: 1.4; height: 40px; }
+.product-spec { font-size: 12px; color: #999; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+
+/* 价格区 - 最大最醒目 */
 .price-section { margin-bottom: 10px; }
-.price-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.price-row { display: flex; align-items: baseline; gap: 8px; }
 .seckill-price { color: #e1251b; display: inline-flex; align-items: baseline; }
-.price-symbol { font-size: 16px; }
-.price-num { font-size: 32px; font-weight: 900; }
+.price-symbol { font-size: 18px; font-weight: 700; }
+.price-num { font-size: 36px; font-weight: 900; line-height: 1; }
 .normal-price { font-size: 14px; color: #bbb; text-decoration: line-through; }
 
-/* 限时秒杀 2x2 标签 */
-.flash-badge-2x2 {
-  display: inline-grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  background: linear-gradient(135deg, #e1251b, #ff4757);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 900;
-  line-height: 1.15;
-  padding: 4px 6px;
-  border-radius: 5px;
-  text-align: center;
-  letter-spacing: 2px;
-  box-shadow: 0 2px 10px rgba(225,37,27,0.5);
-  animation: flashBadgePulse 1.5s ease-in-out infinite;
-}
-@keyframes flashBadgePulse {
-  0%, 100% { box-shadow: 0 2px 10px rgba(225,37,27,0.5); transform: scale(1); }
-  50% { box-shadow: 0 3px 18px rgba(225,37,27,0.8); transform: scale(1.06); }
-}
-
-.discount-tag {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 13px; font-weight: 600; color: #fff;
+/* 直降标签 */
+.save-tags { display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.save-tag-main {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 700; color: #fff;
   background: linear-gradient(135deg, #ff6700, #e1251b);
-  padding: 4px 12px;
-  border-radius: 999px; margin-top: 6px;
-  box-shadow: 0 2px 8px rgba(225,37,27,0.3);
+  padding: 3px 10px; border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(225,37,27,0.3);
+}
+.save-tag-sub {
+  font-size: 11px; font-weight: 700;
+  color: #e1251b; background: #fff0f0;
+  padding: 3px 8px; border-radius: 999px;
+  border: 1px solid #ffd0d0;
 }
 
-.meta-row {
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 13px; color: #666; margin-bottom: 14px;
+/* 紧迫感组件 */
+.urgency-section { margin-bottom: 10px; }
+.stock-bar {
+  width: 100%; height: 6px;
+  background: #f0f0f0; border-radius: 3px;
+  overflow: hidden; margin-bottom: 6px;
 }
-.limit-info, .viewer-info { display: flex; align-items: center; gap: 4px; }
+.stock-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+  box-shadow: 0 0 6px currentColor;
+}
+.urgency-row {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.urgency-stock {
+  font-size: 12px; color: #e1251b; display: flex; align-items: center; gap: 3px;
+}
+.urgency-stock strong { font-weight: 800; font-size: 14px; }
+.urgency-hot {
+  font-size: 12px; color: #999; display: flex; align-items: center; gap: 3px;
+}
+.urgency-hot strong { font-weight: 700; color: #ff6700; }
+
+.limit-row {
+  font-size: 12px; color: #999;
+  display: flex; align-items: center; gap: 4px;
+  margin-bottom: 12px;
+}
 
 /* 抢购按钮 */
 .buy-btn {
-  width: 100%; height: 48px;
-  border: none; border-radius: 10px;
-  font-size: 17px; font-weight: 800;
+  width: 100%; height: 50px;
+  border: 2px solid transparent; border-radius: 10px;
+  font-size: 18px; font-weight: 900;
   letter-spacing: 2px; cursor: pointer;
   position: relative; overflow: hidden;
   transition: transform 0.2s, box-shadow 0.3s;
 }
 .btn-active {
-  background: linear-gradient(135deg, #e1251b, #ff4757);
-  color: #fff; box-shadow: 0 4px 18px rgba(225,37,27,0.4);
-  animation: btnPulse 1.5s ease-in-out infinite;
+  background: linear-gradient(135deg, #e1251b, #ff2d2d);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(225,37,27,0.5);
+  border-color: rgba(255,215,0,0.4);
+  animation: btnPulse 1.5s ease-in-out infinite, btnBorderPulse 2s ease-in-out infinite;
 }
-.btn-active:hover { transform: scale(1.03); box-shadow: 0 6px 28px rgba(225,37,27,0.5); }
-.btn-active::after {
-  content: ''; position: absolute; inset: 0;
+.btn-active:hover { transform: scale(1.03); box-shadow: 0 6px 30px rgba(225,37,27,0.6); }
+.btn-glow {
+  position: absolute; inset: 0;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
   transform: translateX(-100%);
   animation: btnShine 2.5s ease-in-out infinite;
 }
-.btn-disabled { background: #e0e0e0; color: #999; cursor: not-allowed; }
+.btn-disabled { background: #e0e0e0; color: #999; cursor: not-allowed; border-color: #ddd; }
 .btn-text { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; }
-@keyframes btnPulse { 0%,100%{box-shadow:0 4px 18px rgba(225,37,27,0.4);} 50%{box-shadow:0 4px 28px rgba(225,37,27,0.6);} }
+.btn-arrow { animation: arrowBounce 1s ease-in-out infinite; }
+@keyframes btnPulse { 0%,100%{box-shadow:0 4px 20px rgba(225,37,27,0.5);} 50%{box-shadow:0 4px 30px rgba(225,37,27,0.7);} }
+@keyframes btnBorderPulse { 0%,100%{border-color:rgba(255,215,0,0.4);} 50%{border-color:rgba(255,215,0,0.8);} }
 @keyframes btnShine { 0%,70%,100%{transform:translateX(-100%);} 80%{transform:translateX(100%);} }
-
-.recent-orders { margin-top: 10px; font-size: 11px; color: #999; display: flex; align-items: center; gap: 5px; }
-.recent-dot { width: 5px; height: 5px; background: #52c41a; border-radius: 50%; flex-shrink: 0; }
+@keyframes arrowBounce { 0%,100%{transform:translateX(0);} 50%{transform:translateX(4px);} }
 
 /* ==================== 空状态 ==================== */
 .empty-state { text-align: center; padding: 80px 0; }

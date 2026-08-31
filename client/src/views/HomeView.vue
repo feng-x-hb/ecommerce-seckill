@@ -564,24 +564,24 @@ onUnmounted(() => {
   box-shadow: 0 8px 24px rgba(225,37,27,0.12);
 }
 .seckill-banner:hover .flash-badge {
-  transform: scale(1.15);
+  transform: scale(1.15) !important;
 }
 .seckill-banner:hover .seckill-title {
-  font-size: 20px;
+  font-size: 20px !important;
 }
 .seckill-banner:hover .seckill-sub {
-  font-size: 13px;
-  color: #666;
+  font-size: 13px !important;
+  color: #666 !important;
 }
 .seckill-banner:hover .countdown-label {
-  font-size: 12px;
+  font-size: 12px !important;
 }
 .seckill-banner:hover .num-block {
-  font-size: 18px;
-  padding: 5px 10px;
+  font-size: 18px !important;
+  padding: 5px 10px !important;
 }
 .seckill-banner:hover .num-sep {
-  font-size: 18px;
+  font-size: 18px !important;
 }
 .seckill-left {
   display: flex;
@@ -738,4 +738,27 @@ onUnmounted(() => {
 
 @media (max-width: 1200px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 900px) { .product-grid, .hot-grid { grid-template-columns: repeat(3, 1fr); } }
+</style>
+
+<style>
+.seckill-banner:hover .flash-badge {
+  transform: scale(1.15);
+}
+.seckill-banner:hover .seckill-title {
+  font-size: 20px;
+}
+.seckill-banner:hover .seckill-sub {
+  font-size: 13px;
+  color: #666;
+}
+.seckill-banner:hover .countdown-label {
+  font-size: 12px;
+}
+.seckill-banner:hover .num-block {
+  font-size: 18px;
+  padding: 5px 10px;
+}
+.seckill-banner:hover .num-sep {
+  font-size: 18px;
+}
 </style>

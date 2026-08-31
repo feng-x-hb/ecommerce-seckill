@@ -561,8 +561,27 @@ onUnmounted(() => {
   border-radius: 8px;
 }
 .seckill-banner:hover {
-  transform: scale(1.02);
   box-shadow: 0 8px 24px rgba(225,37,27,0.12);
+}
+.seckill-banner:hover .flash-badge {
+  transform: scale(1.15);
+}
+.seckill-banner:hover .seckill-title {
+  font-size: 20px;
+}
+.seckill-banner:hover .seckill-sub {
+  font-size: 13px;
+  color: #666;
+}
+.seckill-banner:hover .countdown-label {
+  font-size: 12px;
+}
+.seckill-banner:hover .num-block {
+  font-size: 18px;
+  padding: 5px 10px;
+}
+.seckill-banner:hover .num-sep {
+  font-size: 18px;
 }
 .seckill-left {
   display: flex;
@@ -578,11 +597,12 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   font-size: 18px;
+  transition: transform 0.3s ease;
 }
-.seckill-title { font-size: 16px; color: var(--jd-red); font-weight: bold; }
-.seckill-sub { font-size: 11px; color: #999; }
+.seckill-title { font-size: 16px; color: var(--jd-red); font-weight: bold; transition: font-size 0.3s ease; }
+.seckill-sub { font-size: 11px; color: #999; transition: font-size 0.3s ease, color 0.3s ease; }
 .countdown-box { text-align: center; }
-.countdown-label { font-size: 11px; color: #999; display: block; margin-bottom: 2px; }
+.countdown-label { font-size: 11px; color: #999; display: block; margin-bottom: 2px; transition: font-size 0.3s ease; }
 .countdown-nums { display: flex; align-items: center; gap: 3px; }
 .num-block {
   background: #333;
@@ -594,8 +614,9 @@ onUnmounted(() => {
   min-width: 34px;
   text-align: center;
   font-variant-numeric: tabular-nums;
+  transition: font-size 0.3s ease, padding 0.3s ease;
 }
-.num-sep { font-size: 15px; font-weight: bold; color: var(--jd-red); }
+.num-sep { font-size: 15px; font-weight: bold; color: var(--jd-red); transition: font-size 0.3s ease; }
 .seckill-more {
   display: flex;
   align-items: center;

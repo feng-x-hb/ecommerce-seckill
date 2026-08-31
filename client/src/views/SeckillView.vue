@@ -15,6 +15,15 @@ const activityId = 1
 const now = ref(Date.now())
 let timer: ReturnType<typeof setInterval>
 
+// ========== 暗色模式 ==========
+const isDark = ref(document.documentElement.getAttribute('data-theme') === 'dark')
+onMounted(() => {
+  const observer = new MutationObserver(() => {
+    isDark.value = document.documentElement.getAttribute('data-theme') === 'dark'
+  })
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+})
+
 // ========== 随机倒计时（每个商品独立，1s ~ 3min） ==========
 const perItemTimers = ref<Record<number, number>>({})
 const perItemTimerIntervals = ref<Record<number, ReturnType<typeof setInterval>>>({})
@@ -168,7 +177,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="seckill-page">
+  <div class="seckill-page" :class="{ dark: isDark }">
     <!-- ========== Hero 头部 ========== -->
     <div class="seckill-hero">
       <div class="light-sweep"></div>
@@ -628,4 +637,23 @@ onUnmounted(() => {
   .hero-tags { justify-content: center; }
   .hero-badge-row { text-align: center; }
 }
+
+/* ==================== 暗色模式 ==================== */
+.dark .seckill-page { background: #121212; }
+.dark .card-body { background: #1e1e1e; }
+.dark .product-name { color: #e0e0e0; }
+.dark .product-spec { color: #888; }
+.dark .normal-price { color: #666; }
+.dark .urgency-stock { color: #ff8a80; }
+.dark .urgency-hot { color: #888; }
+.dark .urgency-hot strong { color: #ffab40; }
+.dark .limit-row { color: #888; }
+.dark .section-title { color: #e0e0e0; }
+.dark .section-desc { color: #888; }
+.dark .save-tag-orange { box-shadow: 0 2px 8px rgba(225,37,27,0.4); }
+.dark .btn-disabled { background: #333; color: #666; border-color: #444; }
+.dark .seckill-card { box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+.dark .seckill-card:hover { box-shadow: 0 12px 32px rgba(225,37,27,0.25); }
+.dark .empty-text { color: #ccc; }
+.dark .empty-sub { color: #888; }
 </style>

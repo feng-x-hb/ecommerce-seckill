@@ -308,9 +308,8 @@ onUnmounted(() => { clearInterval(timer) })
   content: '';
   position: absolute;
   inset: 0;
-  background: url('/images/优购logo设计.png') center/cover no-repeat;
-  opacity: 0.18;
-  mix-blend-mode: screen;
+  background: url('/images/seckill-hero.png') center/cover no-repeat;
+  opacity: 0.45;
   pointer-events: none;
 }
 .hero-glow {

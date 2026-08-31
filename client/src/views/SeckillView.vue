@@ -444,7 +444,7 @@ onUnmounted(() => {
   background: repeating-conic-gradient(
     from 0deg,
     transparent 0deg 8deg,
-    rgba(255,30,0,0.28) 8deg 10deg
+    rgba(255,30,0,0.12) 8deg 10deg
   );
   animation: radialSpin 30s linear infinite;
   z-index: 2;

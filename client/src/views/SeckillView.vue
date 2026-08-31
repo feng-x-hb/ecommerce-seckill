@@ -15,27 +15,27 @@ const activityId = 1
 const now = ref(Date.now())
 let timer: ReturnType<typeof setInterval>
 
-// ========== 随机倒计时（1s ~ 3min） ==========
-const randomCountdown = ref(Math.floor(Math.random() * 179 + 1))
-let countdownTimer: ReturnType<typeof setInterval>
+// ========== 随机倒计时（每个商品独立，1s ~ 3min） ==========
+const perItemTimers = ref<Record<number, number>>({})
+const perItemTimerIntervals = ref<Record<number, ReturnType<typeof setInterval>>>({})
 
-function startRandomCountdown() {
-  randomCountdown.value = Math.floor(Math.random() * 179 + 1)
-  clearInterval(countdownTimer)
-  countdownTimer = setInterval(() => {
-    randomCountdown.value--
-    if (randomCountdown.value <= 0) {
-      startRandomCountdown()
+function initItemTimer(itemId: number) {
+  perItemTimers.value[itemId] = Math.floor(Math.random() * 179 + 1)
+  clearInterval(perItemTimerIntervals.value[itemId])
+  perItemTimerIntervals.value[itemId] = setInterval(() => {
+    perItemTimers.value[itemId]--
+    if (perItemTimers.value[itemId] <= 0) {
+      perItemTimers.value[itemId] = Math.floor(Math.random() * 179 + 1)
     }
   }, 1000)
 }
 
-const randomCountdownDigits = computed(() => {
-  const total = Math.max(0, randomCountdown.value)
+function getRandCountdown(itemId: number) {
+  const total = Math.max(0, perItemTimers.value[itemId] ?? 0)
   const m = Math.floor(total / 60)
   const s = total % 60
-  return { m: String(m).padStart(2, '0'), s: String(s).padStart(2, '0') }
-})
+  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0')
+}
 
 // ========== 价格动画（每次进入重新播放） ==========
 const animatedPrices = ref<Record<number, number>>({})
@@ -137,6 +137,7 @@ async function fetchSeckill() {
     seckillItems.value = res.data
     res.data.forEach((item: any) => {
       animatedPrices.value[item.seckillItemId] = item.normalPrice
+      initItemTimer(item.seckillItemId)
     })
     setupPriceObserver()
   } finally {
@@ -158,11 +159,10 @@ async function handleBuy(item: any) {
 onMounted(() => {
   fetchSeckill()
   timer = setInterval(() => { now.value = Date.now() }, 1000)
-  startRandomCountdown()
 })
 onUnmounted(() => {
   clearInterval(timer)
-  clearInterval(countdownTimer)
+  Object.values(perItemTimerIntervals.value).forEach(id => clearInterval(id))
   observers.value.forEach(o => o.disconnect())
 })
 </script>
@@ -277,7 +277,7 @@ onUnmounted(() => {
               <!-- 角标 - 随机倒计时 -->
               <div class="img-top-right" v-if="item.activityStatus === 1">
                 <el-icon :size="14"><Clock /></el-icon>
-                {{ randomCountdownDigits.m }}:{{ randomCountdownDigits.s }}
+                {{ getRandCountdown(item.seckillItemId) }}
               </div>
             </div>
           </div>
@@ -444,7 +444,7 @@ onUnmounted(() => {
   background: repeating-conic-gradient(
     from 0deg,
     transparent 0deg 8deg,
-    rgba(255,30,0,0.18) 8deg 10deg
+    rgba(255,30,0,0.28) 8deg 10deg
   );
   animation: radialSpin 30s linear infinite;
   z-index: 2;

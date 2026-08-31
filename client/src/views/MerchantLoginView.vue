@@ -2,7 +2,7 @@
 /**
  * 商户登录页 - 与用户登录页布局一致，注册/登录的都是商家账号（role=1）
  */
-import { ref, reactive, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
@@ -12,7 +12,16 @@ const router = useRouter()
 const userStore = useUserStore()
 const isRegister = ref(false)
 const loginMode = ref<'password' | 'sms'>('password')
-const isDark = ref(localStorage.getItem('theme') === 'dark')
+const isDark = ref(document.documentElement.getAttribute('data-theme') === 'dark')
+
+let _observer: MutationObserver | null = null
+onMounted(() => {
+  _observer = new MutationObserver(() => {
+    isDark.value = document.documentElement.getAttribute('data-theme') === 'dark'
+  })
+  _observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+})
+onUnmounted(() => { _observer?.disconnect() })
 
 // 密码登录
 const loginForm = reactive({ account: '', password: '' })
@@ -85,12 +94,6 @@ function sendSmsCode() {
     ElMessage.success('验证码已发送')
     startCountdown()
   }
-}
-
-function toggleTheme() {
-  isDark.value = !isDark.value
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-  document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
 }
 
 async function handleLogin() {

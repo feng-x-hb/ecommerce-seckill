@@ -2,14 +2,23 @@
 /**
  * 找回密码页 - 账号名找回 / 手机号找回
  */
-import { ref, reactive, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import request from '@/api/request'
 
 const router = useRouter()
-const isDark = ref(localStorage.getItem('theme') === 'dark')
+const isDark = ref(document.documentElement.getAttribute('data-theme') === 'dark')
 const resetMode = ref<'account' | 'phone'>('account')
+
+let _observer: MutationObserver | null = null
+onMounted(() => {
+  _observer = new MutationObserver(() => {
+    isDark.value = document.documentElement.getAttribute('data-theme') === 'dark'
+  })
+  _observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+})
+onUnmounted(() => { _observer?.disconnect() })
 
 // 账号名找回
 const accountForm = reactive({ username: '', newPassword: '', confirmPassword: '' })
@@ -90,12 +99,6 @@ function sendSmsCode() {
     ElMessage.success('验证码已发送')
     startCountdown()
   }
-}
-
-function toggleTheme() {
-  isDark.value = !isDark.value
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-  document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
 }
 
 async function handleAccountReset() {

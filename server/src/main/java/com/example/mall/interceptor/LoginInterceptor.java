@@ -44,7 +44,12 @@ public class LoginInterceptor implements HandlerInterceptor {
         String token = authHeader.substring(7);
 
         // 第 3 步：验章，拆出身份信息
-        Claims claims = jwtUtil.parseToken(token);
+        Claims claims;
+        try {
+            claims = jwtUtil.parseToken(token);
+        } catch (Exception e) {
+            throw new UnauthorizedException("登录已过期，请重新登录");
+        }
 
         // 第 4 步：把 userId 和 role 都放进 request，供后续 Controller 使用
         request.setAttribute("userId", Long.parseLong(claims.getSubject()));

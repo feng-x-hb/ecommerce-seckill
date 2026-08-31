@@ -48,12 +48,13 @@ function onMouseLeave() {
     class="product-card"
     ref="cardRef"
     :style="{
-      transform: `perspective(600px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) ${isHovering ? 'translateZ(16px) scale(1.02)' : ''}`,
+      transform: `perspective(600px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) ${isHovering ? 'translateZ(16px) scale(1.06)' : ''}`,
       '--glow-x': glowX + '%',
       '--glow-y': glowY + '%'
     }"
     :class="{ hovering: isHovering }"
     @mousemove="onMouseMove"
+    @mouseenter="isHovering = true"
     @mouseleave="onMouseLeave"
   >
     <div class="card-image">
@@ -107,10 +108,17 @@ function onMouseLeave() {
   overflow: hidden;
   color: var(--jd-text) !important;
   position: relative;
-  transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+  transition: transform 0.2s ease-out, box-shadow 0.3s ease;
   box-shadow: var(--jd-shadow-sm, 0 1px 4px rgba(0,0,0,0.06));
   transform-style: preserve-3d;
   will-change: transform;
+}
+.product-card:hover {
+  transform: perspective(600px) translateZ(8px) scale(1.06) !important;
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.15),
+    0 0 0 1px rgba(225,37,27,0.15),
+    0 0 30px rgba(225,37,27,0.08);
 }
 .product-card.hovering {
   box-shadow:

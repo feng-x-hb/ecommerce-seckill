@@ -33,6 +33,11 @@ request.interceptors.response.use(
     const res = response.data
     if (res.code !== 200) {
       ElMessage.error(res.message || '请求失败')
+      if (res.message === '用户不存在') {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        router.push('/login')
+      }
       return Promise.reject(new Error(res.message))
     }
     return res

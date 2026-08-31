@@ -365,10 +365,10 @@ function handleLogout() {
   text-decoration: none;
   font-size: 13px;
   white-space: nowrap;
-  transition: color 0.25s;
+  transition: color 0.25s, font-size 0.3s ease, padding 0.3s ease;
   border-radius: 4px;
 }
-.nav-link:hover { color: #fff !important; }
+.nav-link:hover { font-size: 16px; color: var(--jd-red, #e1251b) !important; }
 .nav-link-active { color: #fff !important; font-weight: 600; }
 .seckill-link { color: #e1251b !important; font-weight: 600; }
 .seckill-link.nav-link-active { color: #fff !important; }

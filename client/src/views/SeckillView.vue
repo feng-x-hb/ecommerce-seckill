@@ -304,6 +304,15 @@ onUnmounted(() => { clearInterval(timer) })
   overflow: hidden;
   padding: 0;
 }
+.seckill-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/images/优购logo设计.png') center/cover no-repeat;
+  opacity: 0.18;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
 .hero-glow {
   position: absolute;
   top: -50%; left: -20%;

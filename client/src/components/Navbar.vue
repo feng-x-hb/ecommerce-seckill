@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUpdated, nextTick, watch } from 'vue'
+import { ref, onMounted, nextTick, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
@@ -23,20 +23,19 @@ function updateIndicator() {
     const container = navLinksRef.value
     if (!container) return
     const activeEl = container.querySelector('.nav-link-active') as HTMLElement
-    if (!activeEl) { indicatorStyle.value.opacity = 0; return }
+    if (!activeEl) { indicatorStyle.value = { left: '0px', width: '0px', opacity: 0 }; return }
     const containerRect = container.getBoundingClientRect()
     const activeRect = activeEl.getBoundingClientRect()
-    indicatorStyle.value = {
-      left: (activeRect.left - containerRect.left + container.scrollLeft) + 'px',
-      width: activeRect.width + 'px',
-      opacity: 1
+    const newLeft = (activeRect.left - containerRect.left + container.scrollLeft) + 'px'
+    const newWidth = activeRect.width + 'px'
+    if (indicatorStyle.value.left !== newLeft || indicatorStyle.value.width !== newWidth) {
+      indicatorStyle.value = { left: newLeft, width: newWidth, opacity: 1 }
     }
   })
 }
 
 watch(() => route.path, () => { updateIndicator() }, { immediate: true })
 onMounted(() => { updateIndicator() })
-onUpdated(() => { updateIndicator() })
 
 onMounted(() => {
   const saved = localStorage.getItem('searchHistory')

@@ -62,13 +62,13 @@ async function handleChangeCredential() {
       newUsername: credentialForm.newUsername || undefined,
       newPassword: credentialForm.newPassword || undefined
     })
-    await userStore.fetchMe()
-    fetchProfile()
     showCredentialDialog.value = false
     credentialForm.oldPassword = ''
     credentialForm.newUsername = ''
     credentialForm.newPassword = ''
-    ElMessage.success('修改成功')
+    ElMessage.success('修改成功，请重新登录')
+    userStore.logout()
+    router.push('/login')
   } catch (e: any) {
     ElMessage.error(e?.message || '修改失败')
   } finally {

@@ -38,9 +38,20 @@ public class OrderController {
         String receiverName = (String) body.get("receiverName");
         String receiverPhone = (String) body.get("receiverPhone");
         String receiverAddress = (String) body.get("receiverAddress");
-        Long couponId = body.get("couponId") != null ? Long.valueOf(body.get("couponId").toString()) : null;
 
-        String orderNo = orderService.createOrder(userId, skuItems, receiverName, receiverPhone, receiverAddress, couponId);
+        // 每商品优惠券 {skuId: couponId}
+        Map<Long, Long> itemCoupons = new java.util.HashMap<>();
+        if (body.get("itemCoupons") != null) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> raw = (Map<String, Object>) body.get("itemCoupons");
+            for (Map.Entry<String, Object> entry : raw.entrySet()) {
+                if (entry.getValue() != null) {
+                    itemCoupons.put(Long.valueOf(entry.getKey()), Long.valueOf(entry.getValue().toString()));
+                }
+            }
+        }
+
+        String orderNo = orderService.createOrder(userId, skuItems, receiverName, receiverPhone, receiverAddress, itemCoupons);
         return Result.success(Map.of("orderNo", orderNo));
     }
 

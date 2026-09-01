@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
@@ -13,6 +13,7 @@ const isSearchFocused = ref(false)
 const searchHistory = ref<string[]>([])
 const showHistory = ref(false)
 const searchSuggestions = ref<string[]>([])
+const searchWrapperRef = ref<HTMLElement | null>(null)
 
 // 滑动背景指示器
 const navLinksRef = ref<HTMLElement | null>(null)
@@ -40,7 +41,20 @@ onMounted(() => { updateIndicator() })
 onMounted(() => {
   const saved = localStorage.getItem('searchHistory')
   if (saved) searchHistory.value = JSON.parse(saved)
+
+  document.addEventListener('mousedown', handleClickOutside)
 })
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', handleClickOutside)
+})
+
+function handleClickOutside(e: MouseEvent) {
+  if (searchWrapperRef.value && !searchWrapperRef.value.contains(e.target as Node)) {
+    showHistory.value = false
+    searchSuggestions.value = []
+  }
+}
 
 function saveHistory(kw: string) {
   if (!kw.trim()) return
@@ -98,7 +112,7 @@ function handleLogout() {
         </router-link>
 
         <!-- 搜索框 — 中心，上半行 -->
-        <div class="search-wrapper">
+        <div class="search-wrapper" ref="searchWrapperRef">
           <div class="search-box" :class="{ focused: isSearchFocused }">
             <input
               v-model="searchKeyword"
@@ -106,7 +120,6 @@ function handleLogout() {
               placeholder="搜索商品"
               class="search-input"
               @focus="isSearchFocused = true; showHistory = true"
-              @blur="setTimeout(() => { showHistory = false; searchSuggestions = [] }, 200)"
               @keyup.enter="handleSearch()"
               @input="onSearchInput()"
             />

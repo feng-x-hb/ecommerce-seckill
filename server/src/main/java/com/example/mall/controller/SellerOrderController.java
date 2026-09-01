@@ -10,6 +10,8 @@ import com.example.mall.mapper.OrderItemMapper;
 import com.example.mall.mapper.OrderMapper;
 import com.example.mall.mapper.ProductMapper;
 import com.example.mall.vo.OrderItemVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
  * 商家订单管理控制器
  * 商家只能看到包含自己商品的订单
  */
+@Tag(name = "商家-订单", description = "商家查看和处理订单")
 @RestController
 @RequestMapping("/api/seller/order")
 public class SellerOrderController {
@@ -34,6 +37,7 @@ public class SellerOrderController {
     }
 
     /** 获取商家相关订单列表 */
+    @Operation(summary = "商家订单列表")
     @GetMapping("/list")
     public Result<Page<Order>> list(
             @RequestAttribute("userId") Long userId,
@@ -62,6 +66,7 @@ public class SellerOrderController {
     }
 
     /** 订单详情 */
+    @Operation(summary = "商家订单详情")
     @GetMapping("/{orderNo}")
     public Result<Map<String, Object>> detail(@PathVariable String orderNo, @RequestAttribute("userId") Long userId) {
         Order order = orderMapper.selectOne(
@@ -97,6 +102,7 @@ public class SellerOrderController {
     }
 
     /** 发货 */
+    @Operation(summary = "商家发货")
     @PutMapping("/{orderNo}/ship")
     public Result<Void> ship(@PathVariable String orderNo, @RequestAttribute("userId") Long userId) {
         Order order = orderMapper.selectOne(

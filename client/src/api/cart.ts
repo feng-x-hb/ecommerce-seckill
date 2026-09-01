@@ -24,3 +24,8 @@ export function deleteCartItem(id: number) {
 export function updateCartChecked(id: number, checked: number) {
   return request.put(`/cart/${id}/checked`, { checked })
 }
+
+/** 批量删除 */
+export function batchDeleteCart(ids: number[]) {
+  return request.delete('/cart/batch', { data: ids })
+}

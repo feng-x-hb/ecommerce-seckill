@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#43e97b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#38f9d7;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="12" fill="url(#bg)"/>
+  <!-- 房子 -->
+  <path d="M200 100 L280 160 L280 280 L120 280 L120 160 Z" fill="#fff" opacity="0.95"/>
+  <rect x="180" y="220" width="40" height="60" rx="4" fill="rgba(67,233,123,0.3)"/>
+  <rect x="140" y="175" width="35" height="30" rx="3" fill="rgba(67,233,123,0.25)"/>
+  <rect x="225" y="175" width="35" height="30" rx="3" fill="rgba(67,233,123,0.25)"/>
+  <!-- 烟囱 -->
+  <rect x="240" y="110" width="20" height="50" fill="#fff" opacity="0.8"/>
+  <!-- 装饰 -->
+  <circle cx="70" cy="80" r="18" fill="#fff" opacity="0.12"/>
+  <circle cx="340" cy="330" r="25" fill="#fff" opacity="0.1"/>
+</svg>

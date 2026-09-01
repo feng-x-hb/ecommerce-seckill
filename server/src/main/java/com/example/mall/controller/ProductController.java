@@ -4,6 +4,8 @@ import com.example.mall.common.Result;
 import com.example.mall.service.ProductService;
 import com.example.mall.vo.ProductDetailVO;
 import com.example.mall.vo.ProductVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.Map;
  * - GET /api/product/list → 商品列表（分页/分类筛选/搜索）公开
  * - GET /api/product/{id} → 商品详情（含 SKU 列表）公开
  */
+@Tag(name = "商品", description = "商品列表、搜索、详情")
 @RestController
 @RequestMapping("/api/product")
 public class ProductController {
@@ -38,6 +41,7 @@ public class ProductController {
      * 返回：
      *   { "total": 100, "list": [{ "id":1, "title":"iPhone 15", ... }] }
      */
+    @Operation(summary = "商品列表查询")
     @GetMapping("/list")
     public Result<Map<String, Object>> list(
             @RequestParam(defaultValue = "1") int page,
@@ -56,12 +60,14 @@ public class ProductController {
      *
      * 返回：商品完整信息 + 该商品的所有 SKU 列表（规格、价格、库存）
      */
+    @Operation(summary = "商品详情查询")
     @GetMapping("/{id}")
     public Result<ProductDetailVO> detail(@PathVariable Long id) {
         ProductDetailVO detail = productService.detail(id);
         return Result.success(detail);
     }
 
+    @Operation(summary = "搜索建议")
     @GetMapping("/suggest")
     public Result<List<String>> suggest(@RequestParam String keyword) {
         return Result.success(productService.suggest(keyword));

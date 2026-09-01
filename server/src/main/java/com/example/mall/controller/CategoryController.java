@@ -6,6 +6,8 @@ import com.example.mall.dto.CategoryDTO;
 import com.example.mall.entity.Category;
 import com.example.mall.service.CategoryService;
 import com.example.mall.vo.CategoryVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +24,7 @@ import java.util.List;
  * - PUT /api/category/{id} → 修改分类（管理员）
  * - DELETE /api/category/{id} → 删除分类（管理员）
  */
+@Tag(name = "分类", description = "商品分类查询")
 @RestController  // 告诉 Spring：这是一个返回 JSON 的控制器
 @RequestMapping("/api/category")  // 本类所有接口的公共前缀
 public class CategoryController {
@@ -56,6 +59,7 @@ public class CategoryController {
      *   ]
      * }
      */
+    @Operation(summary = "获取分类树")
     @GetMapping("/list")
     public Result<List<CategoryVO>> list() {
         List<CategoryVO> categories = categoryService.list();
@@ -74,6 +78,7 @@ public class CategoryController {
      * 
      * 返回：新分类的 id
      */
+    @Operation(summary = "新增分类")
     @AdminOnly
     @PostMapping
     public Result<Long> add(@Valid @RequestBody CategoryDTO categoryDTO) {
@@ -95,6 +100,7 @@ public class CategoryController {
      * 参数：id 从 URL 取，CategoryDTO 从请求体取
      * 转换：DTO → Entity 后传给 Service
      */
+    @Operation(summary = "修改分类")
     @AdminOnly
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @Valid @RequestBody CategoryDTO categoryDTO) {
@@ -116,6 +122,7 @@ public class CategoryController {
      * 
      * 注意：id 从 URL 路径里取（@PathVariable）
      */
+    @Operation(summary = "删除分类")
     @AdminOnly
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {

@@ -21,6 +21,7 @@ const loading = ref(true)
 const isFavorited = ref(false)
 const reviews = ref<any[]>([])
 const reviewTotal = ref(0)
+const showCartFly = ref(false)
 
 async function fetchProduct() {
   loading.value = true
@@ -46,6 +47,8 @@ async function handleAddCart() {
   if (selectedSku.value.stock <= 0) return ElMessage.warning('库存不足')
   try {
     await addToCart(selectedSku.value.id, quantity.value)
+    showCartFly.value = true
+    setTimeout(() => { showCartFly.value = false }, 800)
     ElMessage.success('已加入购物车')
   } catch { /* interceptor handles */ }
 }
@@ -175,6 +178,10 @@ onMounted(async () => {
         </div>
       </div>
     </template>
+    <!-- 加入购物车飞入动画 -->
+    <div v-if="showCartFly" class="cart-fly">
+      <div class="cart-fly-dot">🛒</div>
+    </div>
   </div>
 </template>
 
@@ -351,5 +358,26 @@ onMounted(async () => {
   font-size: 14px;
   color: #666;
   line-height: 1.6;
+}
+
+/* 加入购物车飞入动画 */
+.cart-fly {
+  position: fixed;
+  top: 0; right: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+.cart-fly-dot {
+  position: absolute;
+  bottom: 200px;
+  left: 50%;
+  font-size: 32px;
+  animation: flyToCart 0.7s cubic-bezier(0.5, -0.5, 1, 1) forwards;
+}
+@keyframes flyToCart {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  60% { transform: translate(30vw, -40vh) scale(0.5); opacity: 0.8; }
+  100% { transform: translate(50vw, -80vh) scale(0.2); opacity: 0; }
 }
 </style>

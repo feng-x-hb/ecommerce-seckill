@@ -7,6 +7,8 @@ import com.example.mall.entity.Product;
 import com.example.mall.entity.Sku;
 import com.example.mall.mapper.ProductMapper;
 import com.example.mall.mapper.SkuMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -16,6 +18,7 @@ import java.util.List;
  * 商家商品管理控制器
  * 商家只能管理自己上架的商品（通过 seller_id 隔离）
  */
+@Tag(name = "商家-商品", description = "商家管理自己的商品")
 @RestController
 @RequestMapping("/api/seller/product")
 public class SellerProductController {
@@ -29,6 +32,7 @@ public class SellerProductController {
     }
 
     /** 分页查询自己的商品 */
+    @Operation(summary = "商家商品列表")
     @GetMapping("/list")
     public Result<Page<Product>> list(
             @RequestAttribute("userId") Long userId,
@@ -50,6 +54,7 @@ public class SellerProductController {
     }
 
     /** 商品详情 */
+    @Operation(summary = "商家商品详情")
     @GetMapping("/{id}")
     public Result<Product> detail(@PathVariable Long id, @RequestAttribute("userId") Long userId) {
         Product product = productMapper.selectById(id);
@@ -60,6 +65,7 @@ public class SellerProductController {
     }
 
     /** 获取商品的 SKU 列表 */
+    @Operation(summary = "商品SKU列表")
     @GetMapping("/{id}/sku")
     public Result<List<Sku>> skuList(@PathVariable Long id, @RequestAttribute("userId") Long userId) {
         Product product = productMapper.selectById(id);
@@ -72,6 +78,7 @@ public class SellerProductController {
     }
 
     /** 添加商品 */
+    @Operation(summary = "添加商品")
     @PostMapping
     public Result<Product> add(@RequestBody Product product, @RequestAttribute("userId") Long userId) {
         product.setSellerId(userId);
@@ -83,6 +90,7 @@ public class SellerProductController {
     }
 
     /** 更新商品 */
+    @Operation(summary = "更新商品")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @RequestBody Product product, @RequestAttribute("userId") Long userId) {
         Product existing = productMapper.selectById(id);
@@ -95,6 +103,7 @@ public class SellerProductController {
     }
 
     /** 上架 */
+    @Operation(summary = "商品上架")
     @PutMapping("/{id}/onshelf")
     public Result<Void> onShelf(@PathVariable Long id, @RequestAttribute("userId") Long userId) {
         Product product = productMapper.selectById(id);
@@ -105,6 +114,7 @@ public class SellerProductController {
     }
 
     /** 下架 */
+    @Operation(summary = "商品下架")
     @PutMapping("/{id}/offshelf")
     public Result<Void> offShelf(@PathVariable Long id, @RequestAttribute("userId") Long userId) {
         Product product = productMapper.selectById(id);
@@ -115,6 +125,7 @@ public class SellerProductController {
     }
 
     /** 删除商品 */
+    @Operation(summary = "删除商品")
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id, @RequestAttribute("userId") Long userId) {
         Product product = productMapper.selectById(id);
@@ -124,6 +135,7 @@ public class SellerProductController {
     }
 
     /** 商家统计 */
+    @Operation(summary = "商家商品统计")
     @GetMapping("/stats")
     public Result<Object> stats(@RequestAttribute("userId") Long userId) {
         Long totalProducts = productMapper.selectCount(

@@ -21,6 +21,9 @@ public interface CartService {
     /** 删除购物车项 */
     void delete(Long userId, Long cartItemId);
 
+    /** 批量删除购物车项 */
+    void batchDelete(Long userId, List<Long> ids);
+
     /** 勾选/取消勾选 */
     void updateChecked(Long userId, Long cartItemId, Integer checked);
 }

@@ -3,7 +3,7 @@
  * 下单页（CheckoutView.vue）
  * 每个商品独立选择优惠券，不可叠加
  */
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { createOrder } from '@/api/order'
 import { getMyCoupons } from '@/api/coupon'
@@ -17,10 +17,10 @@ const receiverPhone = ref('')
 const receiverAddress = ref('')
 const submitting = ref(false)
 
-// 优惠券：每个商品独立选择
 const myCoupons = ref<any[]>([])
-const itemCouponMap = ref<Record<number, number | null>>({})  // skuId → couponId
-const couponPickerTarget = ref<number | null>(null)  // 当前打开选券弹窗的 skuId
+const itemCouponMap = ref<Record<number, number | null>>({})
+const showCouponPicker = ref(false)
+const pickerItem = ref<CartItem | null>(null)
 
 const totalOriginal = computed(() => items.value.reduce((s, i) => s + i.price * i.quantity, 0))
 
@@ -57,7 +57,6 @@ function getItemCoupon(item: CartItem): any | null {
   return myCoupons.value.find(c => c.id === couponId) || null
 }
 
-// 已被其他商品选中的优惠券 id 列表
 const usedCouponIds = computed(() => {
   const ids: number[] = []
   for (const item of items.value) {
@@ -67,20 +66,32 @@ const usedCouponIds = computed(() => {
   return ids
 })
 
-function getCouponsForItem(item: CartItem) {
+const dialogCoupons = computed(() => {
+  if (!pickerItem.value) return []
+  const item = pickerItem.value
   const subTotal = item.price * item.quantity
-  return myCoupons.value.filter(c => {
-    if (usedCouponIds.value.includes(c.id) && itemCouponMap.value[item.skuId] !== c.id) return false
-    return true
-  }).map(c => ({
-    ...c,
-    disabled: subTotal < c.minAmount
-  }))
+  return myCoupons.value
+    .filter(c => {
+      if (usedCouponIds.value.includes(c.id) && itemCouponMap.value[item.skuId] !== c.id) return false
+      return true
+    })
+    .map(c => ({
+      ...c,
+      disabled: subTotal < c.minAmount
+    }))
+})
+
+function openCouponPicker(item: CartItem) {
+  pickerItem.value = item
+  showCouponPicker.value = true
 }
 
-function selectItemCoupon(item: CartItem, couponId: number | null) {
-  itemCouponMap.value[item.skuId] = couponId
-  couponPickerTarget.value = null
+function selectItemCoupon(couponId: number) {
+  if (pickerItem.value) {
+    itemCouponMap.value[pickerItem.value.skuId] = couponId
+  }
+  showCouponPicker.value = false
+  pickerItem.value = null
 }
 
 function clearItemCoupon(item: CartItem) {
@@ -91,7 +102,6 @@ onMounted(async () => {
   const data = sessionStorage.getItem('checkoutItems')
   if (!data) { router.push('/cart'); return }
   items.value = JSON.parse(data)
-  // 初始化每个商品的券为空
   items.value.forEach(item => { itemCouponMap.value[item.skuId] = null })
 
   try {
@@ -136,7 +146,6 @@ async function handleSubmit() {
   <div class="checkout-page container">
     <h2 class="page-title">确认订单</h2>
 
-    <!-- 收货信息 -->
     <div class="section card">
       <h3 class="section-title">收货信息</h3>
       <div class="form-grid">
@@ -155,7 +164,6 @@ async function handleSubmit() {
       </div>
     </div>
 
-    <!-- 商品清单 + 每商品选券 -->
     <div class="section card">
       <h3 class="section-title">商品清单</h3>
       <div v-for="item in items" :key="item.id" class="checkout-item">
@@ -169,14 +177,13 @@ async function handleSubmit() {
         <div class="item-info">
           <div class="item-name ellipsis">{{ item.productName }}</div>
           <div class="item-spec">{{ item.specs }}</div>
-          <!-- 每商品优惠券选择 -->
           <div class="item-coupon-row">
             <div v-if="getItemCoupon(item)" class="item-coupon-active">
               <span class="item-coupon-tag">🎫 {{ getItemCoupon(item).name }}</span>
               <span class="item-coupon-discount">-¥{{ getItemDiscount(item).toFixed(0) }}</span>
               <el-button text type="danger" size="small" @click="clearItemCoupon(item)">取消</el-button>
             </div>
-            <div v-else class="item-coupon-pick" @click="couponPickerTarget = item.skuId">
+            <div v-else class="item-coupon-pick" @click="openCouponPicker(item)">
               <span>选择优惠券</span>
               <span class="arrow">›</span>
             </div>
@@ -191,27 +198,23 @@ async function handleSubmit() {
       </div>
     </div>
 
-    <!-- 优惠券选择弹窗（按商品） -->
-    <el-dialog v-model="couponPickerTarget" title="选择优惠券" width="480px" :close-on-click-modal="true">
-      <template v-if="couponPickerTarget !== null">
-        <div v-if="!myCoupons.length" class="no-coupon">暂无可用优惠券，去<a href="/coupons">领券中心</a>领取</div>
-        <div v-for="c in getCouponsForItem(items.find(i => i.skuId === couponPickerTarget)!)" :key="c.id"
-          class="coupon-card"
-          :class="{ active: itemCouponMap[couponPickerTarget] === c.id, disabled: c.disabled }"
-          @click="!c.disabled && selectItemCoupon(items.find(i => i.skuId === couponPickerTarget)!, c.id)">
-          <div class="coupon-left">
-            <div class="coupon-amount"><span class="coupon-symbol">¥</span><span class="coupon-value">{{ c.discount }}</span></div>
-          </div>
-          <div class="coupon-right">
-            <div class="coupon-name">{{ c.name }}</div>
-            <div class="coupon-condition">满{{ c.minAmount }}可用</div>
-            <div class="coupon-expire">有效期至 {{ c.endDate }}</div>
-          </div>
+    <el-dialog v-model="showCouponPicker" title="选择优惠券" width="480px" :close-on-click-modal="true" @close="pickerItem = null">
+      <div v-if="!myCoupons.length" class="no-coupon">暂无可用优惠券，去<a href="/coupons">领券中心</a>领取</div>
+      <div v-for="c in dialogCoupons" :key="c.id"
+        class="coupon-card"
+        :class="{ active: pickerItem && itemCouponMap[pickerItem.skuId] === c.id, disabled: c.disabled }"
+        @click="!c.disabled && selectItemCoupon(c.id)">
+        <div class="coupon-left">
+          <div class="coupon-amount"><span class="coupon-symbol">¥</span><span class="coupon-value">{{ c.discount }}</span></div>
         </div>
-      </template>
+        <div class="coupon-right">
+          <div class="coupon-name">{{ c.name }}</div>
+          <div class="coupon-condition">满{{ c.minAmount }}可用</div>
+          <div class="coupon-expire">有效期至 {{ c.endDate }}</div>
+        </div>
+      </div>
     </el-dialog>
 
-    <!-- 提交栏 -->
     <div class="submit-bar card">
       <div class="submit-info">
         <div class="submit-total">共 <strong>{{ items.reduce((s, i) => s + i.quantity, 0) }}</strong> 件商品</div>
@@ -245,7 +248,6 @@ async function handleSubmit() {
 .item-subtotal { width: 100px; text-align: right; }
 .item-sub-original { font-size: 12px; color: #bbb; text-decoration: line-through; }
 
-/* 每商品优惠券 */
 .item-coupon-row { margin-top: 8px; }
 .item-coupon-active {
   display: inline-flex; align-items: center; gap: 8px;
@@ -263,7 +265,6 @@ async function handleSubmit() {
 .item-coupon-pick:hover { background: #f0f0f0; border-color: #ff9900; color: #ff6600; }
 .arrow { font-size: 16px; }
 
-/* 弹窗内优惠券卡片 */
 .no-coupon { text-align: center; color: #999; padding: 24px; }
 .no-coupon a { color: #e1251b; text-decoration: none; }
 .coupon-card { display: flex; margin-bottom: 12px; border: 2px solid #f0f0f0; border-radius: 10px; overflow: hidden; cursor: pointer; transition: all 0.2s; }
@@ -279,7 +280,6 @@ async function handleSubmit() {
 .coupon-condition { font-size: 12px; color: #999; }
 .coupon-expire { font-size: 12px; color: #bbb; }
 
-/* 提交栏 */
 .submit-bar { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; position: sticky; bottom: 0; }
 .submit-info { display: flex; align-items: baseline; gap: 20px; }
 .submit-total { font-size: 14px; color: #666; }

@@ -149,6 +149,16 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
+    public void batchDelete(Long userId, List<Long> ids) {
+        cartItemMapper.delete(
+            new LambdaQueryWrapper<CartItem>()
+                .eq(CartItem::getUserId, userId)
+                .in(CartItem::getId, ids)
+        );
+    }
+
+    @Override
+    @Transactional
     public void updateChecked(Long userId, Long cartItemId, Integer checked) {
         CartItem item = cartItemMapper.selectById(cartItemId);
         if (item == null || !item.getUserId().equals(userId)) {

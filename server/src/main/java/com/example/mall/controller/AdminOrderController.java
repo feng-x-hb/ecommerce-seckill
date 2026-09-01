@@ -12,6 +12,8 @@ import com.example.mall.mapper.OrderMapper;
 import com.example.mall.mapper.UserMapper;
 import com.example.mall.vo.OrderDetailVO;
 import com.example.mall.vo.OrderItemVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ import java.util.List;
  * 管理员订单审核控制器
  * 查看所有订单，审核并发货
  */
+@Tag(name = "管理-订单", description = "管理员订单管理")
 @RestController
 @RequestMapping("/api/admin/order")
 public class AdminOrderController {
@@ -36,6 +39,7 @@ public class AdminOrderController {
     }
 
     /** 分页查询所有订单（管理员看全部） */
+    @Operation(summary = "管理员订单列表")
     @GetMapping("/list")
     @AdminOnly
     public Result<Page<Order>> list(
@@ -56,6 +60,7 @@ public class AdminOrderController {
     }
 
     /** 订单详情（含商品明细 + 买家信息） */
+    @Operation(summary = "管理员订单详情")
     @GetMapping("/{orderNo}")
     @AdminOnly
     public Result<OrderDetailVO> detail(@PathVariable String orderNo) {
@@ -101,6 +106,7 @@ public class AdminOrderController {
     }
 
     /** 审核通过：标记为已发货 */
+    @Operation(summary = "审核通过并发货")
     @PutMapping("/{orderNo}/ship")
     @AdminOnly
     public Result<Void> ship(@PathVariable String orderNo) {
@@ -114,6 +120,7 @@ public class AdminOrderController {
     }
 
     /** 驳回订单（标记为已取消） */
+    @Operation(summary = "驳回订单")
     @PutMapping("/{orderNo}/reject")
     @AdminOnly
     public Result<Void> reject(@PathVariable String orderNo) {

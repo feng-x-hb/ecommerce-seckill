@@ -10,6 +10,8 @@ import com.example.mall.entity.Sku;
 import com.example.mall.mapper.SeckillActivityMapper;
 import com.example.mall.mapper.SeckillItemMapper;
 import com.example.mall.mapper.SkuMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
 /**
  * 管理员秒杀活动管理控制器
  */
+@Tag(name = "管理-秒杀", description = "管理员秒杀活动管理")
 @RestController
 @RequestMapping("/api/admin/seckill")
 public class AdminSeckillController {
@@ -32,6 +35,7 @@ public class AdminSeckillController {
     }
 
     /** 分页查询所有秒杀活动 */
+    @Operation(summary = "秒杀活动列表")
     @GetMapping("/activity/list")
     @AdminOnly
     public Result<Page<SeckillActivity>> activityList(
@@ -44,6 +48,7 @@ public class AdminSeckillController {
     }
 
     /** 获取活动详情 */
+    @Operation(summary = "秒杀活动详情")
     @GetMapping("/activity/{id}")
     @AdminOnly
     public Result<SeckillActivity> activityDetail(@PathVariable Long id) {
@@ -53,6 +58,7 @@ public class AdminSeckillController {
     }
 
     /** 创建秒杀活动 */
+    @Operation(summary = "创建秒杀活动")
     @PostMapping("/activity")
     @AdminOnly
     public Result<SeckillActivity> createActivity(@RequestBody SeckillActivity activity) {
@@ -62,6 +68,7 @@ public class AdminSeckillController {
     }
 
     /** 更新秒杀活动 */
+    @Operation(summary = "更新秒杀活动")
     @PutMapping("/activity/{id}")
     @AdminOnly
     public Result<Void> updateActivity(@PathVariable Long id, @RequestBody SeckillActivity activity) {
@@ -71,6 +78,7 @@ public class AdminSeckillController {
     }
 
     /** 删除秒杀活动 */
+    @Operation(summary = "删除秒杀活动")
     @DeleteMapping("/activity/{id}")
     @AdminOnly
     public Result<Void> deleteActivity(@PathVariable Long id) {
@@ -81,6 +89,7 @@ public class AdminSeckillController {
     }
 
     /** 获取活动下的秒杀商品列表 */
+    @Operation(summary = "秒杀商品列表")
     @GetMapping("/activity/{activityId}/items")
     @AdminOnly
     public Result<List<SeckillItem>> itemList(@PathVariable Long activityId) {
@@ -90,6 +99,7 @@ public class AdminSeckillController {
     }
 
     /** 添加秒杀商品到活动 */
+    @Operation(summary = "添加秒杀商品")
     @PostMapping("/activity/{activityId}/item")
     @AdminOnly
     public Result<SeckillItem> addItem(@PathVariable Long activityId, @RequestBody SeckillItem item) {
@@ -104,6 +114,7 @@ public class AdminSeckillController {
     }
 
     /** 删除秒杀商品 */
+    @Operation(summary = "删除秒杀商品")
     @DeleteMapping("/item/{id}")
     @AdminOnly
     public Result<Void> deleteItem(@PathVariable Long id) {
@@ -112,6 +123,7 @@ public class AdminSeckillController {
     }
 
     /** 获取所有 SKU（供选择添加秒杀商品） */
+    @Operation(summary = "所有SKU列表")
     @GetMapping("/sku/list")
     @AdminOnly
     public Result<List<Sku>> allSkuList() {

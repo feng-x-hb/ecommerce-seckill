@@ -3,15 +3,24 @@
  * 购物车页（CartView.vue）
  * 京东风格：商品列表 + 勾选 + 改数量 + 小计 + 底部结算栏
  */
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { getCartList, updateCartQuantity, deleteCartItem, updateCartChecked } from '@/api/cart'
+import { getCartList, updateCartQuantity, deleteCartItem, updateCartChecked, batchDeleteCart } from '@/api/cart'
 import type { CartItem } from '@/types'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const router = useRouter()
 const cartItems = ref<CartItem[]>([])
 const loading = ref(false)
+const isDark = ref(document.documentElement.getAttribute('data-theme') === 'dark')
+
+onMounted(() => {
+  const observer = new MutationObserver(() => {
+    isDark.value = document.documentElement.getAttribute('data-theme') === 'dark'
+  })
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+  onBeforeUnmount(() => observer.disconnect())
+})
 
 async function fetchCart() {
   loading.value = true
@@ -58,6 +67,15 @@ async function toggleCheck(item: CartItem) {
   item.checked = newVal
 }
 
+async function handleBatchDelete() {
+  if (checkedItems.value.length === 0) return ElMessage.warning('请先选择要删除的商品')
+  await ElMessageBox.confirm(`确定删除选中的 ${checkedItems.value.length} 件商品？`, '提示', { type: 'warning' })
+  const ids = checkedItems.value.map(i => i.id)
+  await batchDeleteCart(ids)
+  cartItems.value = cartItems.value.filter(i => !ids.includes(i.id))
+  ElMessage.success('已批量删除')
+}
+
 function goCheckout() {
   if (checkedItems.value.length === 0) return ElMessage.warning('请至少选择一件商品')
   // 将已勾选项存到 sessionStorage，下单页读取
@@ -69,7 +87,7 @@ onMounted(fetchCart)
 </script>
 
 <template>
-  <div class="cart-page container">
+  <div class="cart-page container" :class="{ dark: isDark }">
     <h2 class="page-title">我的购物车</h2>
 
     <div v-loading="loading" class="cart-content">
@@ -135,6 +153,9 @@ onMounted(fetchCart)
             </label>
           </div>
           <div class="footer-right">
+            <el-button v-if="checkedItems.length > 0" type="danger" link @click="handleBatchDelete">
+              删除选中({{ checkedItems.length }})
+            </el-button>
             <span>已选 <strong>{{ totalCount }}</strong> 件商品</span>
             <span class="footer-total">合计：<span class="price price-lg">¥{{ totalPrice.toFixed(2) }}</span></span>
             <el-button type="primary" size="large" @click="goCheckout" :disabled="checkedItems.length === 0">
@@ -222,4 +243,17 @@ onMounted(fetchCart)
   gap: 20px;
 }
 .footer-total { margin-left: 12px; font-size: 14px; }
+
+.dark .cart-page { background: #121212; }
+.dark .cart-content { background: #1e1e1e; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+.dark .page-title { color: #e0e0e0; }
+.dark .cart-header { border-bottom-color: #333; color: #888; }
+.dark .cart-row { border-bottom-color: #333; }
+.dark .cart-row:hover { background: #252525; }
+.dark .item-name { color: #e0e0e0; }
+.dark .item-spec { background: #333; color: #aaa; }
+.dark .cart-footer { border-top-color: #333; }
+.dark .check-all { color: #aaa; }
+.dark .footer-right { color: #aaa; }
+.dark .empty-cart p { color: #888; }
 </style>

@@ -9,6 +9,8 @@ import com.example.mall.dto.ProfileDTO;
 import com.example.mall.dto.ChangeCredentialDTO;
 import com.example.mall.service.AuthService;
 import com.example.mall.vo.UserInfoVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 职责红线：只负责"接请求 → 转给 Service → 把结果打包返回"，
  * 不写任何业务规则（查重、加密那些事都在 Service 里）。
  */
+@Tag(name = "认证", description = "用户注册、登录、密码重置")
 @RestController                            // 告诉 Spring：这是一个返回 JSON 的控制器
 @RequestMapping("/api/auth")               // 本类所有接口的公共前缀，路径从这里开始
 public class AuthController {
@@ -38,6 +41,7 @@ public class AuthController {
      * 注册接口：POST /api/auth/register
      * 对应接口设计文档：请求体传 username / password / phone，返回注册成功的用户 id。
      */
+    @Operation(summary = "用户注册")
     @PostMapping("/register")
     public Result<Long> register(@Valid @RequestBody RegisterDTO registerDTO) {
         // 1. @RequestBody：把 JSON 转成 RegisterDTO
@@ -51,6 +55,7 @@ public class AuthController {
      * 登录接口：POST /api/auth/login
      * 请求体传 {account, password}；成功返回 token + 用户基本信息（LoginVO）。
      */
+    @Operation(summary = "用户登录")
     @PostMapping("/login")
     public Result<LoginVO> login(@Valid @RequestBody LoginDTO loginDTO) {
         // 1. @RequestBody：把 JSON 转成 LoginDTO（account 可以是用户名或手机号）
@@ -68,6 +73,7 @@ public class AuthController {
      *   这个属性是 LoginInterceptor 验过 token 之后放进去的——所以本接口天然要求登录，
      *   没带 token 会被拦截器挡成 401，不会进到这个方法。
      */
+    @Operation(summary = "获取当前用户信息")
     @GetMapping("/me")
     public Result<UserInfoVO> me(@RequestAttribute("userId") Long userId) {
         UserInfoVO userInfo = authService.me(userId);
@@ -78,6 +84,7 @@ public class AuthController {
      * 重置密码：POST /api/auth/reset-password
      * 无需登录，传 username 或 phone + newPassword 即可。
      */
+    @Operation(summary = "重置密码")
     @PostMapping("/reset-password")
     public Result<Void> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
         authService.resetPassword(resetPasswordDTO);
@@ -88,6 +95,7 @@ public class AuthController {
      * 更新个人资料：PUT /api/auth/profile
      * 需要登录，可更新昵称、头像、个性签名。
      */
+    @Operation(summary = "更新个人资料")
     @PutMapping("/profile")
     public Result<Void> updateProfile(@RequestAttribute("userId") Long userId,
                                       @RequestBody ProfileDTO profileDTO) {
@@ -99,6 +107,7 @@ public class AuthController {
      * 修改账号名或密码：PUT /api/auth/credential
      * 需要登录，必须验证旧密码。
      */
+    @Operation(summary = "修改账号名或密码")
     @PutMapping("/credential")
     public Result<Void> changeCredential(@RequestAttribute("userId") Long userId,
                                          @Valid @RequestBody ChangeCredentialDTO dto) {

@@ -3,6 +3,8 @@ package com.example.mall.controller;
 import com.example.mall.common.Result;
 import com.example.mall.service.SeckillService;
 import com.example.mall.vo.SeckillItemVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Map;
  * GET /api/seckill/list?activityId=1  公开，不需要登录
  * POST /api/seckill/buy              需要登录
  */
+@Tag(name = "秒杀", description = "秒杀活动列表与抢购")
 @RestController
 @RequestMapping("/api/seckill")
 public class SeckillController {
@@ -25,12 +28,14 @@ public class SeckillController {
     }
 
     /** 秒杀活动列表 */
+    @Operation(summary = "秒杀活动商品列表")
     @GetMapping("/list")
     public Result<List<SeckillItemVO>> list(@RequestParam Long activityId) {
         return Result.success(seckillService.listSeckillItems(activityId));
     }
 
     /** 秒杀抢购 */
+    @Operation(summary = "秒杀抢购")
     @PostMapping("/buy")
     public Result<Map<String, String>> buy(@RequestAttribute("userId") Long userId,
                                            @RequestBody Map<String, Long> body) {

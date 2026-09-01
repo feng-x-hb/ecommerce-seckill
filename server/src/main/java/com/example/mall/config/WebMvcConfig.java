@@ -33,8 +33,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
         var registration = registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/api/**");
 
+        // 放行 Swagger / OpenAPI 文档路径（不需要登录）
+        registration.excludePathPatterns(
+                "/swagger-ui/**", "/swagger-ui.html",
+                "/v3/api-docs/**", "/v3/api-docs",
+                "/doc.html", "/webjars/**");
+
         // 再把白名单里的每一个公开路径逐个放行
-        // 例：/api/auth/register、/api/auth/login、/api/category/list
         for (String path : publicPaths) {
             registration.excludePathPatterns(path);
         }

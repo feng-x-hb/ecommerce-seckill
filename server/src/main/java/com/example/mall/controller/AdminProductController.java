@@ -8,6 +8,8 @@ import com.example.mall.entity.Product;
 import com.example.mall.entity.Sku;
 import com.example.mall.mapper.ProductMapper;
 import com.example.mall.mapper.SkuMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
  * 管理员可以上架平台自营商品（seller_id = 管理员自己的 id）
  * 也可以管理所有商家的商品（审核/下架）
  */
+@Tag(name = "管理-商品", description = "管理员商品管理")
 @RestController
 @RequestMapping("/api/admin/product")
 public class AdminProductController {
@@ -30,6 +33,7 @@ public class AdminProductController {
     }
 
     /** 分页查询所有商品（管理员看全部，含下架商品） */
+    @Operation(summary = "管理员商品列表")
     @GetMapping("/list")
     @AdminOnly
     public Result<Page<Product>> list(
@@ -50,6 +54,7 @@ public class AdminProductController {
     }
 
     /** 商品详情（含 SKU 列表） */
+    @Operation(summary = "管理员商品详情")
     @GetMapping("/{id}")
     @AdminOnly
     public Result<Product> detail(@PathVariable Long id) {
@@ -59,6 +64,7 @@ public class AdminProductController {
     }
 
     /** 获取商品的 SKU 列表 */
+    @Operation(summary = "商品SKU列表")
     @GetMapping("/{id}/sku")
     @AdminOnly
     public Result<List<Sku>> skuList(@PathVariable Long id) {
@@ -68,6 +74,7 @@ public class AdminProductController {
     }
 
     /** 上架商品 */
+    @Operation(summary = "上架商品")
     @PutMapping("/{id}/onshelf")
     @AdminOnly
     public Result<Void> onShelf(@PathVariable Long id) {
@@ -79,6 +86,7 @@ public class AdminProductController {
     }
 
     /** 下架商品 */
+    @Operation(summary = "下架商品")
     @PutMapping("/{id}/offshelf")
     @AdminOnly
     public Result<Void> offShelf(@PathVariable Long id) {
@@ -90,6 +98,7 @@ public class AdminProductController {
     }
 
     /** 删除商品（管理员权限） */
+    @Operation(summary = "删除商品")
     @DeleteMapping("/{id}")
     @AdminOnly
     public Result<Void> delete(@PathVariable Long id) {
@@ -98,6 +107,7 @@ public class AdminProductController {
     }
 
     /** 添加平台自营商品 */
+    @Operation(summary = "添加平台自营商品")
     @PostMapping
     @AdminOnly
     public Result<Product> add(@RequestBody Product product, @RequestAttribute("userId") Long userId) {
@@ -109,6 +119,7 @@ public class AdminProductController {
     }
 
     /** 更新商品信息 */
+    @Operation(summary = "更新商品信息")
     @PutMapping("/{id}")
     @AdminOnly
     public Result<Void> update(@PathVariable Long id, @RequestBody Product product) {

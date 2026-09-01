@@ -3,6 +3,8 @@ package com.example.mall.controller;
 import com.example.mall.common.Result;
 import com.example.mall.service.OrderService;
 import com.example.mall.vo.OrderDetailVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Map;
  * 所有接口都需要登录（不在公开白名单中）。
  * 前端带 token → 拦截器解析 userId → Controller 用 @RequestAttribute 取出。
  */
+@Tag(name = "订单", description = "订单创建、支付、查询")
 @RestController
 @RequestMapping("/api/order")
 public class OrderController {
@@ -30,6 +33,7 @@ public class OrderController {
      * 参数：{ skuItems: [{skuId, quantity}], receiverName, receiverPhone, receiverAddress }
      * 返回：订单号 orderNo
      */
+    @Operation(summary = "创建订单")
     @PostMapping("/create")
     public Result<Map<String, String>> create(@RequestAttribute("userId") Long userId,
                                               @RequestBody Map<String, Object> body) {
@@ -59,6 +63,7 @@ public class OrderController {
      * 模拟支付
      * POST /api/order/{orderNo}/pay
      */
+    @Operation(summary = "模拟支付")
     @PostMapping("/{orderNo}/pay")
     public Result<Void> pay(@RequestAttribute("userId") Long userId,
                             @PathVariable String orderNo) {
@@ -70,6 +75,7 @@ public class OrderController {
      * 取消订单（恢复库存）
      * POST /api/order/{orderNo}/cancel
      */
+    @Operation(summary = "取消订单")
     @PostMapping("/{orderNo}/cancel")
     public Result<Void> cancel(@RequestAttribute("userId") Long userId,
                                @PathVariable String orderNo) {
@@ -81,6 +87,7 @@ public class OrderController {
      * 订单列表（分页）
      * GET /api/order/list?page=1&size=10&status=0（status 可选）
      */
+    @Operation(summary = "订单列表查询")
     @GetMapping("/list")
     public Result<Map<String, Object>> list(@RequestAttribute("userId") Long userId,
                                             @RequestParam(defaultValue = "1") int page,
@@ -94,6 +101,7 @@ public class OrderController {
      * 订单详情（含明细列表）
      * GET /api/order/{orderNo}
      */
+    @Operation(summary = "订单详情查询")
     @GetMapping("/{orderNo}")
     public Result<OrderDetailVO> detail(@RequestAttribute("userId") Long userId,
                                         @PathVariable String orderNo) {
@@ -105,6 +113,7 @@ public class OrderController {
      * 修改收货地址（仅待支付状态）
      * PUT /api/order/{orderNo}/address
      */
+    @Operation(summary = "修改收货地址")
     @PutMapping("/{orderNo}/address")
     public Result<Void> updateAddress(@RequestAttribute("userId") Long userId,
                                       @PathVariable String orderNo,
